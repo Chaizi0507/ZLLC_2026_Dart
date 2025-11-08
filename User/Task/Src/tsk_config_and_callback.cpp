@@ -142,14 +142,14 @@ void Chassis_Device_CAN2_Callback(Struct_CAN_Rx_Buffer *CAN_RxMessage)
     switch (CAN_RxMessage->Header.Identifier)
     {
 
-        case (0x208):
+        case (0x205):
         {
-            chariot.Chassis.Motor_Steer[1].CAN_RxCpltCallback(CAN_RxMessage->Data);
+            chariot.Chassis.Motor_Steer[0].CAN_RxCpltCallback(CAN_RxMessage->Data);
         }
         break;
         case (0x206):
         {
-            chariot.Chassis.Motor_Steer[0].CAN_RxCpltCallback(CAN_RxMessage->Data);
+            chariot.Chassis.Motor_Steer[1].CAN_RxCpltCallback(CAN_RxMessage->Data);
         }
         break;
         case (0x207):
@@ -157,11 +157,31 @@ void Chassis_Device_CAN2_Callback(Struct_CAN_Rx_Buffer *CAN_RxMessage)
             chariot.Chassis.Motor_Steer[2].CAN_RxCpltCallback(CAN_RxMessage->Data);
         }
         break;
-        case (0x205):
+        case (0x208):
         {
             chariot.Chassis.Motor_Steer[3].CAN_RxCpltCallback(CAN_RxMessage->Data);
         }
         break;
+        case(0xD1):
+        {
+            chariot.Chassis.Motor_Steer[0].MA600_Data_Process(CAN_RxMessage);
+        }
+        break;
+        case(0xD2):
+        {
+            chariot.Chassis.Motor_Steer[1].MA600_Data_Process(CAN_RxMessage);
+        }
+        break;
+        case(0xD3):
+        {
+            chariot.Chassis.Motor_Steer[2].MA600_Data_Process(CAN_RxMessage);
+        }
+        break;
+        case(0xD4):
+        {
+            chariot.Chassis.Motor_Steer[3].MA600_Data_Process(CAN_RxMessage);
+        }
+        break;       
         case (0x67)://超电接收
         {
             chariot.Chassis.Supercap.CAN_RxCpltCallback(CAN_RxMessage->Data);
@@ -220,7 +240,21 @@ void Gimbal_Device_CAN2_Callback(Struct_CAN_Rx_Buffer *CAN_RxMessage)
 {
     switch (CAN_RxMessage->Header.Identifier)
     {
-
+    case (0x201):
+    {
+        chariot.Gimbal.Motor_Pitch_L.CAN_RxCpltCallback(CAN_RxMessage->Data);
+    }
+    break;
+    case (0x202):
+    {
+        chariot.Gimbal.Motor_Pitch_R.CAN_RxCpltCallback(CAN_RxMessage->Data);
+    }
+    break;
+    case (0x203):
+    {
+        chariot.Gimbal.Motor_Yaw.CAN_RxCpltCallback(CAN_RxMessage->Data);
+    }
+    break;
     }
 		
 }
@@ -520,7 +554,7 @@ extern "C" void Task_Init()
         //遥控器接收
         #ifdef USE_DR16
         UART_Init(&huart5, DR16_UART5_Callback, 18);
-		UART_Init(&huart6, Image_UART6_Callback, 40);
+		//UART_Init(&huart6, Image_UART6_Callback, 40);
         #elif defined(USE_VT13)
         UART_Init(&huart9, VT13_UART_Callback, 30);
         #endif

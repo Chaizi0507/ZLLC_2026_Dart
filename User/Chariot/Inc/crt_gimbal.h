@@ -18,11 +18,11 @@
 #include "dvc_minipc.h"
 #include "dvc_imu.h"
 #include "dvc_lkmotor.h"
-
+#include "alg_fsm.h"
 /* Exported macros -----------------------------------------------------------*/
 
 /* Exported types ------------------------------------------------------------*/
-
+class Class_Gimbal;
 
 /**
  * @brief 云台控制类型
@@ -35,184 +35,21 @@ enum Enum_Gimbal_Control_Type :uint8_t
     Gimbal_Control_Type_MINIPC,
 };
 
-enum Enum_Motor_Yaw_Type :uint8_t
-{
-    Yaw_A = 0,
-    Yaw_B,
-};
-
-struct IMU_Data
-{
-    float Pitch;
-    float Roll;
-    float Yaw;
-    float Omega_X;
-    float Omega_Y;
-    float Omega_Z;
-};
-
 /**
- * @brief Specialized, yaw轴电机类
+ * @brief Specialized, Yaw轴校准有限自动机
  *
  */
-class Class_Gimbal_Yaw_Motor_GM6020 : public Class_DJI_Motor_GM6020
+class Class_FSM_Yaw_Calibration : public Class_FSM
 {
 public:
-    //陀螺仪获取云台角速度
-    Class_IMU *IMU;
+    Class_Gimbal *Gimbal;
 
-    inline float Get_Trer_Rad_Yaw();
-    inline float Get_True_Gyro_Yaw();
-    inline float Get_True_Angle_Yaw();
+    float Torque_Threshold = 0.0f;
+    float Angle_Left = 0.0f;
+    float Angle_Right = 0.0f;
 
-    void Transform_Angle();
-
-    void TIM_PID_PeriodElapsedCallback();
-
-protected:
-    //初始化相关常量
-
-    //常量
-
-    //内部变量
-    float True_Rad_Yaw = 0.0f;
-    float True_Angle_Yaw = 0.0f;
-    float True_Gyro_Yaw = 0.0f;
-    //读变量
-
-    //写变量
-
-    //读写变量
-
-    //内部函数
+    void Reload_TIM_Status_PeriodElapsedCallback();
 };
-
-float Class_Gimbal_Yaw_Motor_GM6020::Get_Trer_Rad_Yaw()
-{
-    return (True_Rad_Yaw);
-} 
-
-float Class_Gimbal_Yaw_Motor_GM6020::Get_True_Gyro_Yaw()
-{
-    return (True_Gyro_Yaw);
-}
-
-float Class_Gimbal_Yaw_Motor_GM6020::Get_True_Angle_Yaw()
-{
-    return (True_Angle_Yaw);
-}
-
-/**
- * @brief Specialized, pitch轴电机类
- *
- */
-class Class_Gimbal_Pitch_Motor_GM6020 : public Class_DJI_Motor_GM6020
-{
-public:
-    //陀螺仪获取云台角速度
-    Class_IMU* IMU;
-
-
-    inline float Get_True_Rad_Pitch();
-    inline float Get_True_Gyro_Pitch();
-    inline float Get_True_Angle_Pitch();
-
-    void Transform_Angle();
-
-    void TIM_PID_PeriodElapsedCallback();
-
-protected:
-    //初始化相关变量
-
-    //常量
-    
-
-    // 重力补偿
-    float Gravity_Compensate = 0.0f;
-
-    //内部变量
-    float True_Rad_Pitch = 0.0f;
-    float True_Angle_Pitch = 0.0f;
-    float True_Gyro_Pitch = 0.0f;
-    //读变量
-
-    //写变量
-
-    //读写变量
-
-    //内部函数
-};
-
-float Class_Gimbal_Pitch_Motor_GM6020::Get_True_Rad_Pitch()
-{
-    return (True_Rad_Pitch);
-}
-
-float Class_Gimbal_Pitch_Motor_GM6020::Get_True_Angle_Pitch()
-{
-    return (True_Angle_Pitch);
-}
-
-float Class_Gimbal_Pitch_Motor_GM6020::Get_True_Gyro_Pitch()
-{
-    return (True_Gyro_Pitch);
-}
-
-
-/**
- * @brief Specialized, pitch轴电机类
- *
- */
-class Class_Gimbal_Pitch_Motor_LK6010 : public Class_LK_Motor
-{
-public:
-    //陀螺仪获取云台角速度
-    Class_IMU* IMU;
-    
-    inline float Get_True_Rad_Pitch();
-    inline float Get_True_Gyro_Pitch();
-    inline float Get_True_Angle_Pitch();
-
-    void Transform_Angle();
-
-    void TIM_PID_PeriodElapsedCallback();
-
-protected:
-    //初始化相关变量
-
-    //常量
-
-    // 重力补偿
-    float Gravity_Compensate = 0.0f;
-
-    //内部变量 
-    float True_Rad_Pitch = 0.0f;
-    float True_Angle_Pitch = 0.0f;
-    float True_Gyro_Pitch = 0.0f;
-    //读变量
-
-    //写变量
-
-    //读写变量
-
-    //内部函数
-};
-
-float Class_Gimbal_Pitch_Motor_LK6010::Get_True_Rad_Pitch()
-{
-    return (True_Rad_Pitch);
-}
-
-float Class_Gimbal_Pitch_Motor_LK6010::Get_True_Angle_Pitch()
-{
-    return (True_Angle_Pitch);
-}
-
-float Class_Gimbal_Pitch_Motor_LK6010::Get_True_Gyro_Pitch()
-{
-    return (True_Gyro_Pitch);
-
-}
 
 /**
  * @brief Specialized, 云台类
@@ -227,14 +64,12 @@ public:
 
     Class_MiniPC *MiniPC;
 
-    /*后期yaw pitch这两个类要换成其父类，大疆电机类*/
+    Class_FSM_Yaw_Calibration FSM_Yaw_Calibration;
+    friend class Class_FSM_Yaw_Calibration;
 
-    // yaw轴电机
-    Class_DJI_Motor_GM6020 Motor_Yaw;
-
-    // pitch轴电机
-    Class_DJI_Motor_GM6020 Motor_Pitch;
-
+    Class_DJI_Motor_C610 Motor_Pitch_L;
+    Class_DJI_Motor_C610 Motor_Pitch_R;
+    Class_DJI_Motor_C610 Motor_Yaw;
 
     void Init();
 
@@ -256,9 +91,9 @@ protected:
     float CRUISE_SPEED_YAW = 100.f;
     float CRUISE_SPEED_PITCH = 70.f;
     // yaw轴最小值
-    float Min_Yaw_Angle = - 180.0f;
+    float Min_Yaw_Angle = - 10.0f;
     // yaw轴最大值
-    float Max_Yaw_Angle = 180.0f;
+    float Max_Yaw_Angle = 10.0f;
 
     //yaw总角度
     float Yaw_Total_Angle;
