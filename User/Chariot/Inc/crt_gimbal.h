@@ -35,6 +35,24 @@ enum Enum_Gimbal_Control_Type :uint8_t
     Gimbal_Control_Type_MINIPC,
 };
 
+/*
+2006-C610校准变量
+*/
+struct Struct_C610_Calibration_Variables
+{
+    float Calibrate_Offset;//校准完后记录偏移角度
+    float Calibrate_Speed;
+    float Calibrate_Stiffness;//校准力矩
+    uint16_t calibration_count;
+};
+/*
+校准状态
+*/
+enum Enum_Calibration_Status :uint8_t//1为校准完毕  0为未校准成功
+{
+    Calibration_Status_None = 0,
+    Calibration_Status_Normol,
+};
 /**
  * @brief Specialized, Yaw轴校准有限自动机
  *
@@ -44,13 +62,30 @@ class Class_FSM_Yaw_Calibration : public Class_FSM
 public:
     Class_Gimbal *Gimbal;
 
+    //各个电机对象校准Status 
+    Enum_Calibration_Status Calibration_Status[3];
+
+    //
     float Torque_Threshold = 0.0f;
     float Angle_Left = 0.0f;
     float Angle_Right = 0.0f;
 
     void Reload_TIM_Status_PeriodElapsedCallback();
 };
+class Class_DJI_Motor_C610_Dart_Type : public Class_DJI_Motor_C610
+{
+public:
+    //校准需要用到的变量封装到结构体种
+    Struct_C610_Calibration_Variables  Calibration_Variables;
 
+    void Calibration_Init(float Cali_Speed,float Cali_Stiffness);
+
+    void TIM_Calculate_PeriodElapsedCallback();
+
+    float Transform_Target_Angle;//弧度制
+
+    float Transform_Now_Angle;//弧度制
+};
 /**
  * @brief Specialized, 云台类
  *
@@ -67,9 +102,9 @@ public:
     Class_FSM_Yaw_Calibration FSM_Yaw_Calibration;
     friend class Class_FSM_Yaw_Calibration;
 
-    Class_DJI_Motor_C610 Motor_Pitch_L;
-    Class_DJI_Motor_C610 Motor_Pitch_R;
-    Class_DJI_Motor_C610 Motor_Yaw;
+    Class_DJI_Motor_C610_Dart_Type Motor_Pitch_L;
+    Class_DJI_Motor_C610_Dart_Type Motor_Pitch_R;
+    Class_DJI_Motor_C610_Dart_Type Motor_Yaw;
 
     void Init();
 
@@ -126,6 +161,9 @@ protected:
     //内部函数
 
     void Output();
+
+    //校准函数
+    bool  Motor_Calibration(Class_DJI_Motor_C610_Dart_Type *motor,float *Cali_Offset,float Cali_Omega,float Cali_Max_Out,uint16_t &count);
 };
 
 /* Exported variables --------------------------------------------------------*/

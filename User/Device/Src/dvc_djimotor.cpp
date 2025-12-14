@@ -433,30 +433,30 @@ void Class_DJI_Motor_GM6020::TIM_PID_PeriodElapsedCallback()
     Output();
 }
 
-void Class_DJI_Motor_GM6020::TIM_SMC_PeriodElapsedCallback()
-{
-    switch (DJI_Motor_Control_Method)
-    {
-        case DJI_Motor_Control_Method_OPENLOOP:
-        {
-            Out = 0.0f;
-            Output();
-            break;
-        }
+// void Class_DJI_Motor_GM6020::TIM_SMC_PeriodElapsedCallback()
+// {
+//     switch (DJI_Motor_Control_Method)
+//     {
+//         case DJI_Motor_Control_Method_OPENLOOP:
+//         {
+//             Out = 0.0f;
+//             Output();
+//             break;
+//         }
        
-        default:
-        {
-            SMC_Control.Set_Target(Target_Angle);
-            SMC_Control.Set_Now(Transform_Angle, Transform_Omega);                   
+//         default:
+//         {
+//             SMC_Control.Set_Target(Target_Angle);
+//             SMC_Control.Set_Now(Transform_Angle, Transform_Omega);                   
 
-            SMC_Control.TIM_Adjust_PeriodElapsedCallback();
-            Out = SMC_Control.Get_Out();
-            //Out = Test_Out;
-            Output();
-            break;
-        }
-    }
-}
+//             SMC_Control.TIM_Adjust_PeriodElapsedCallback();
+//             Out = SMC_Control.Get_Out();
+//             //Out = Test_Out;
+//             Output();
+//             break;
+//         }
+//     }
+// }
 
 /**
  * @brief 电机初始化
