@@ -319,8 +319,8 @@ void Class_Gimbal::Output()
         Motor_Pitch_L.Set_Target_Radian(-Target_Pitch_Angle * PI / 180.0f);
         Motor_Pitch_R.Set_Target_Radian(Target_Pitch_Angle * PI / 180.0f);//由于反装这里左电机角度环目标取负 与右边电机相对 左边正转向上走
         //调试用
-        Motor_Pitch_L.Set_Target_Radian((-test_a) * PI / 180.0f);
-        Motor_Pitch_R.Set_Target_Radian((test_a) * PI / 180.0f);
+        // Motor_Pitch_L.Set_Target_Radian((-test_a) * PI / 180.0f);
+        // Motor_Pitch_R.Set_Target_Radian((test_a) * PI / 180.0f);
     }
 }
 
@@ -332,7 +332,7 @@ void Class_Gimbal::TIM_Calculate_PeriodElapsedCallback()
 {
 
     //FSM_Yaw_Calibration.Reload_TIM_Status_PeriodElapsedCallback();
-    FSM_Pitch_Calibration.Reload_TIM_Status_PeriodElapsedCallback();
+    //FSM_Pitch_Calibration.Reload_TIM_Status_PeriodElapsedCallback();
 
 
 

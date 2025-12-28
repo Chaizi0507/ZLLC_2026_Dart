@@ -56,7 +56,7 @@ public:
 };
 
 /**
- * @brief Specialized, Yaw轴校准有限自动机
+ * @brief Specialized, Pitch轴校准有限自动机
  *
  */
 class Class_FSM_Pitch_Calibration : public Class_FSM

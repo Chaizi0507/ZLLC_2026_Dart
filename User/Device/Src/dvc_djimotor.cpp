@@ -605,6 +605,7 @@ void Class_DJI_Motor_C610::TIM_PID_PeriodElapsedCallback()
     {
         PID_Omega.Set_Target(Target_Omega_Radian);
         PID_Omega.Set_Now(Data.Now_Omega_Radian);
+        //PID_Omega.Set_Now(Transform_Omega);
         PID_Omega.TIM_Adjust_PeriodElapsedCallback();
 
         Out = PID_Omega.Get_Out();
