@@ -3,12 +3,12 @@ name: ZLLC_2026
 type: ARM
 deviceName: STM32H723VGTx
 packDir: .pack/Keil/STM32H7xx_DFP.4.0.0
-srcDirs: []
+srcDirs:
+  - ../Drivers/CMSIS/DSP/Lib/ARM
 virtualFolder:
   name: <virtual_root>
   files:
-    - path: .cmsis/libdsp/arm/arm_cortexM7l_math.lib
-    - path: ../Core/Src/main.c
+    - path: ../Drivers/CMSIS/DSP/Lib/ARM/arm_cortexM7lfsp_math.lib
   folders:
     - name: Config
       files:
@@ -319,7 +319,6 @@ targets:
         - __FPU_PRESENT=1
         - __FPU_USED=1
         - ARM_MATH_CM7
-        - USE_PWR_LDO_SUPPLY
       incList:
         - .
         - ../Core/Inc
@@ -340,12 +339,9 @@ targets:
         - ../Drivers/CMSIS/Include
         - .cmsis/include
         - RTE/_ZLLC_2026
-        - ../Middlewares/ST/ARM/DSP
-        - ../Drivers/CMSIS/DSP
         - ../Middlewares/ST/ARM
         - ../Middlewares/ST/ARM/DSP/Inc
-        - ../Middlewares/ST
-        - ../DSP/Include/dsp
+        - ../Drivers/CMSIS/DSP/Lib/ARM
       libList: []
     excludeList: []
     toolchain: AC6

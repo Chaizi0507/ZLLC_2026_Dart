@@ -376,6 +376,20 @@ void SuperCAP_UART1_Callback(uint8_t *Buffer, uint16_t Length)
     chariot.Chassis.Supercap.UART_RxCpltCallback(Buffer);
 }
 #endif
+
+/**
+ * @brief UART1拉力计回调函数
+ *
+ * @param Buffer UART1收到的消息
+ * @param Length 长度
+ */
+#if defined GIMBAL
+void Tension_UART1_Callback(uint8_t *Buffer, uint16_t Length)
+{
+    chariot.Booster.TensionMeter.UART_RxCpltCallback(Buffer, Length);
+}
+#endif
+
 /**
  * @brief USB MiniPC回调函数
  *
@@ -576,6 +590,9 @@ extern "C" void Task_Init()
         USB_Init(&MiniPC_USB_Manage_Object,MiniPC_USB_Callback);
         //上位机串口
         UART_Init(&huart8, MiniPC_UART_Callback, 56);
+        //拉力机串口
+        UART_Init(&huart1, Tension_UART1_Callback, 32);
+
 
     #endif
 
