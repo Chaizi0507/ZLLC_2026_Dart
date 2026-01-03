@@ -39,10 +39,10 @@ class Class_Booster;
 enum Enum_Booster_Control_Type
 {
     Booster_Control_Type_DISABLE = 0,
-    Booster_Control_Type_NORMAL, // 暂时不用
+    Booster_Control_Type_NORMAL, 
     Booster_Control_Type_Push_CALIBRATION,
     Booster_Control_Type_Pull_CALIBRATION,
-    Booster_Control_Type_Shooting,
+    //Booster_Control_Type_Shooting,
 
 };
 
@@ -60,6 +60,7 @@ enum Enum_Shooting_Control_Type
     Shooting_Control_Type_DISABLE = 0,
     Shooting_Control_Type_READY_PRE,
     Shooting_Control_Type_READY,
+    Shooting_Control_Type_SHOOTING,
 
 };
 
@@ -170,6 +171,8 @@ public:
     inline int Get_Target_Tension();
     inline float Get_Target_position_push();
     inline float Get_Target_position_pull();
+    inline float Get_Now_position_push();
+    inline float Get_Now_position_pull();
 
     inline void Set_Booster_Control_Type(Enum_Booster_Control_Type __Booster_Control_Type);
     inline void Set_Shooting_Control_Type(Enum_Shooting_Control_Type __Shooting_Control_Type);
@@ -180,6 +183,9 @@ public:
     inline void Set_Target_Tension(int __Target_Tension);
     inline void Set_Target_position_push(float __target_position_push);
     inline void Set_Target_position_pull(float __target_position_pull);
+    inline void Set_Now_position_push(float __now_position_push);
+    inline void Set_Now_position_pull(float __now_position_pull);
+
 
     void TIM_Calculate_PeriodElapsedCallback();
     void Output();
@@ -191,8 +197,11 @@ protected:
     bool Push_Calibration_Finished = false;
     bool Pull_Calibration_Finished = false;
 
-    float target_position_push = 0.03f; // 校准完成后push电机目标位置
+    float target_position_push = 0.05f; // 校准完成后push电机目标位置
     float target_position_pull = 0.9f; // 校准完成后pull电机目标位置
+
+    float now_position_push = 0.0f;// 当前push电机位置
+    float now_position_pull = 0.0f;// 当前pull电机位置
 
     // 舵机相关
     float tirrger_fire_angle = 235.0f; // 舵机发射角度
@@ -213,7 +222,6 @@ protected:
 
     // 读写变量
     float Target_PushMotor_Angle = 0.0f;
-
     float Target_PullMotor_Angle = 0.0f;
 
     // 内部函数
@@ -266,6 +274,16 @@ inline float Class_Booster::Get_Target_position_push()
 inline float Class_Booster::Get_Target_position_pull()
 {
     return (target_position_pull);
+}
+
+inline float Class_Booster::Get_Now_position_push()
+{
+    return (now_position_push);
+}
+
+inline float Class_Booster::Get_Now_position_pull()
+{
+    return (now_position_pull);
 }
 
 /**
@@ -326,6 +344,16 @@ inline void Class_Booster::Set_Target_position_push(float __target_position_push
 inline void Class_Booster::Set_Target_position_pull(float __target_position_pull)
 {
     target_position_pull = __target_position_pull;
+}
+
+inline void Class_Booster::Set_Now_position_push(float __now_position_push)
+{
+    now_position_push = __now_position_push;
+}
+
+inline void Class_Booster::Set_Now_position_pull(float __now_position_pull)
+{
+    now_position_pull = __now_position_pull;
 }
 
 #endif

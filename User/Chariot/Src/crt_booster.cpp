@@ -14,8 +14,14 @@
 #include "crt_booster.h"
 
 /* Private macros ------------------------------------------------------------*/
-extern bool Push_Calibration_Finished = false;
-extern bool Pull_Calibration_Finished = false;
+
+// 校准是否完成相关标志位
+bool Push_Calibration_Finished = false;
+bool Pull_Calibration_Finished = false;
+
+// 是否允许发射相关标志位
+//bool Loading_Slider_Ready; // 上膛滑块机构就位
+bool Referee_Allow_Shoot;  // 裁判系统允许发射
 
 // int servo_test;
 int servo_test_flag = 0;
@@ -247,6 +253,8 @@ void Class_FSM_Push_Calibration::Reload_TIM_Status_PeriodElapsedCallback()
         float now_position_l = Linear_Map_Position(Booster->Motor_Push_L.Get_Now_Angle(), Angle_Backward_L, Angle_Forward_L, 1.0f);
         float now_position_r = Linear_Map_Position(Booster->Motor_Push_R.Get_Now_Angle(), Angle_Backward_R, Angle_Forward_R, 1.0f);
         float now_position = (now_position_l + now_position_r) / 2.0f;
+        Booster->Set_Now_position_push(now_position); // 更新当前push电机位置
+        // 更新PID输入值
         Booster->Motor_Push_L.Set_Transform_Angle(now_position);
         Booster->Motor_Push_R.Set_Transform_Angle(now_position);
 
@@ -330,6 +338,8 @@ void Class_FSM_Pull_Calibration::Reload_TIM_Status_PeriodElapsedCallback()
     {
         // 定义上面是1.0f最大行程 下面是0.0f最小行程
         float now_position = Linear_Map_Position(Booster->Motor_Pull.Get_Now_Angle(), Angle_Backward, Angle_Forward, 1.0f); // 注意这里颠倒了
+        Booster->Set_Now_position_pull(now_position);                                                                       // 更新当前pull电机位置
+        // 更新PID输入值
         Booster->Motor_Pull.Set_Transform_Angle(now_position);
 
         if (Push_Calibration_Finished && Pull_Calibration_Finished)
@@ -349,14 +359,30 @@ void Class_FSM_Shooting::Reload_TIM_Status_PeriodElapsedCallback()
     {
     case (Shooting_Control_Type_DISABLE):
     {
-        // if (Push_Calibration_Finished && Pull_Calibration_Finished)//
-        // {
-        //     Set_Status(Shooting_Control_Type_READY_PRE);
-        // }
+        // disable状态下，保持电机关闭
+        // other code------
+
+        // 转到 READY_PRE 状态的条件：大状态是Booster_Control_Type_NORMAL(校准完成)，且裁判系统允许发射
+        if (Booster->Get_Booster_Control_Type() == Booster_Control_Type_NORMAL && Referee_Allow_Shoot)
+        {
+            Set_Status(Shooting_Control_Type_READY_PRE);
+        }
+        else
+        {
+            // 保持电机在初始位置
+            Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+            Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+            Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+
+            Booster->Motor_Pull.Set_Target_Radian(Booster->target_position_pull);
+            Booster->Motor_Push_L.Set_Target_Radian(Booster->target_position_push);
+            Booster->Motor_Push_R.Set_Target_Radian(Booster->target_position_push);
+        }
     }
     break;
-    case (Shooting_Control_Type_READY_PRE): //
+    case (Shooting_Control_Type_READY_PRE): // 预准备状态：停留一会儿，让舵机撒放器闭合扣住，上膛滑块就位
     {
+        // PULL电机和PUSH电机位置保持在初始目标位置
         Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
         Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
         Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
@@ -364,30 +390,83 @@ void Class_FSM_Shooting::Reload_TIM_Status_PeriodElapsedCallback()
         Booster->Motor_Pull.Set_Target_Radian(Booster->target_position_pull);
         Booster->Motor_Push_L.Set_Target_Radian(Booster->target_position_push);
         Booster->Motor_Push_R.Set_Target_Radian(Booster->target_position_push);
-        // 继续跑这个，以免时间不够，没到位置
+        // 继续跑这个，以免时间不够，没到位置（因为之前的NORMAL也在跑）这个不确定，再说
 
-        // 停留一会儿让舵机闭合 在底下
-        Booster->Set_Target_position_push(test_0_1_push);
-
-        if (Status[Now_Status_Serial].Time > 500)
+        if (Booster->Get_Now_position_push() < 0.08f && Status[Now_Status_Serial].Time > 500) // 等待500ms 让撒放器扣住
         {
-            Set_Status(Shooting_Control_Type_READY);
+            // 撒放器闭合已经在跑校准过程中完成，但是由于循环跑状态机，所以要再设置一次
+            Booster->Servo_Trigger.Set_Target_Angle(Booster->tirrger_reset_angle); // 舵机扣住
+
+            if (Status[Now_Status_Serial].Time > 850) // 等待350ms,扣住之后，上膛电机往上走
+            {
+                Booster->Motor_Push_L.Set_Target_Radian(1.0f);
+                Booster->Motor_Push_R.Set_Target_Radian(1.0f);
+            }
+            // 写一个判断持续监测上膛滑块是否就位
+            // 条件为：整体booster处于Normal状态,上膛滑块就位(位置>0.95)，且裁判系统允许发射
+            if (Booster->Get_Booster_Control_Type() == Booster_Control_Type_NORMAL 
+                    && Booster->Get_Now_position_push() > 0.95f 
+                    && Referee_Allow_Shoot)
+            {
+                Set_Status(Shooting_Control_Type_READY);//进入 READY 状态
+            }
+            else
+            {
+                //否则不动 卡在这里
+            }
         }
     }
     break;
-    case (Shooting_Control_Type_READY): //
+    case (Shooting_Control_Type_READY): // 正式准备状态，等待信号，可以发射
     {
-        // Booster->Pull_Tension_Control();
+        // Pull电机跑拉力环
+        //  Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+        //  Booster->Pull_Tension_Control();
 
+        // Push电机在最上面位置保持，就位状态
         Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
         Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+        Booster->Motor_Push_L.Set_Target_Radian(1.0f);
+        Booster->Motor_Push_R.Set_Target_Radian(1.0f);
 
-        Booster->Motor_Push_L.Set_Target_Radian(Booster->target_position_push);
-        Booster->Motor_Push_R.Set_Target_Radian(Booster->target_position_push);
+        // 发射条件：上膛滑块就位，整体booster处于Normal状态，拉力环达到目标拉力。裁判系统允许发射（这个最关键 是控制发射的最后指令）
+        if (Booster->Get_Booster_Control_Type() == Booster_Control_Type_NORMAL
+            && Booster->Get_Now_position_push() > 0.95f 
+            &&fabs(Booster->now_tension_value - Booster->target_tension_value) < 0.5f && Referee_Allow_Shoot)
+        {
+            Set_Status(Shooting_Control_Type_SHOOTING); // 进入发射状态
+        }
+        else
+        {
+            // 否则不动 卡在这里
+        }
     }
     break;
-    case (3): // 后侧检测
+    case (Shooting_Control_Type_SHOOTING):
     {
+        // 发射动作：舵机转到发射角度
+        Booster->Servo_Trigger.Set_Target_Angle(Booster->tirrger_fire_angle);
+
+        // 发射后，等待一段时间让球飞出
+        if (Status[Now_Status_Serial].Time > 500) // 等待500ms
+        {
+            // 发射完成后，恢复舵机位置
+            // 此处继续保持打开状态，等待上膛
+            Booster->Servo_Trigger.Set_Target_Angle(Booster->tirrger_fire_angle); // 尤其注意！！！
+
+            // 发射完成后，Push电机回到初始位置
+            Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+            Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+            Booster->Motor_Push_L.Set_Target_Radian(Booster->target_position_push);
+            Booster->Motor_Push_R.Set_Target_Radian(Booster->target_position_push);
+
+            // 发射完成后，Pull电机回初始位置
+            Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+            Booster->Motor_Pull.Set_Target_Radian(Booster->target_position_pull);
+
+            // 重置状态机，回到 READY_PRE 状态，准备下一次发射
+            Set_Status(Shooting_Control_Type_READY_PRE);
+        }
     }
     break;
     case (4): // 正常控制流程
@@ -510,7 +589,7 @@ void Class_Booster::Output()
         // Motor_Push_R.Set_Out(0.f);
     }
     break;
-    case (Booster_Control_Type_NORMAL): // 校准结束，进入准备发射状态
+    case (Booster_Control_Type_NORMAL): // 校准结束，进入正常控制状态（发射/换弹等）
     {
         //-----------------------
         Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
@@ -523,7 +602,7 @@ void Class_Booster::Output()
         //-------------------------------------------------
 
         ////进入Shooting状态机
-        Set_Shooting_Control_Type(Shooting_Control_Type_READY_PRE);
+        // Set_Shooting_Control_Type(Shooting_Control_Type_READY_PRE);
     }
     break;
 
