@@ -48,7 +48,7 @@ protected:
  */
 inline float Class_TensionMeter::Get_Tension()
 {
-    return Now_Tension;
+    return Now_Tension ; 
 }
 
 /**

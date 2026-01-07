@@ -120,7 +120,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name>V</Name>
+          <Name>?</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -164,6 +164,22 @@
           <Filename>..\User\Driver\Src\drv_uart.cpp</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\ZLLC_2026\../User/Driver/Src/drv_uart.cpp\223</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>422</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134243208</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\User\Driver\Src\drv_can.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\ZLLC_2026\../User/Driver/Src/drv_can.cpp\422</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -217,47 +233,22 @@
         <Ww>
           <count>0</count>
           <WinNumber>2</WinNumber>
-          <ItemText>target_position_b</ItemText>
+          <ItemText>servo_test_flag</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>2</WinNumber>
-          <ItemText>\\ZLLC_2026\../User/Task/Src/tsk_config_and_callback.cpp\chariot.Booster.Motor_Pull.Data.Now_Torque</ItemText>
+          <ItemText>test_0_1_push</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Motor_Pull_Angle_P_test</ItemText>
+          <ItemText>test_0_1_pull</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Motor_Pull_Angle_I_test</ItemText>
-        </Ww>
-        <Ww>
-          <count>4</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>\\ZLLC_2026\../User/Task/Src/tsk_config_and_callback.cpp\chariot.Booster.Motor_Pull.PID_Angle.Out</ItemText>
-        </Ww>
-        <Ww>
-          <count>5</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>\\ZLLC_2026\../User/Task/Src/tsk_config_and_callback.cpp\chariot.Booster.Motor_Push_L.Data.Now_Torque</ItemText>
-        </Ww>
-        <Ww>
-          <count>6</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>servo_test_flag</ItemText>
-        </Ww>
-        <Ww>
-          <count>7</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>test_0_1_push</ItemText>
-        </Ww>
-        <Ww>
-          <count>8</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>test_0_1_pull</ItemText>
+          <ItemText>\\ZLLC_2026\../User/Task/Src/tsk_config_and_callback.cpp\chariot.Booster.TensionMeter.Now_Tension</ItemText>
         </Ww>
       </WatchWindow2>
       <Tracepoint>
@@ -570,7 +561,7 @@
       <GroupNumber>5</GroupNumber>
       <FileNumber>19</FileNumber>
       <FileType>8</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\Device\Src\dvc_TensionMeter.cpp</PathWithFileName>
