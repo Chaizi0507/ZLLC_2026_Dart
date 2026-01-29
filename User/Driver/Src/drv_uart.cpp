@@ -137,6 +137,7 @@ void TIM_UART_PeriodElapsedCallback()
  * @param huart UART编号
  * @param Size 长度
  */
+int tttt = 0;
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {    
     //停止DMA接收 保护处理过程
@@ -151,6 +152,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
             UART1_Manage_Object.Callback_Function(UART1_Manage_Object.Rx_Buffer, Size);
         else
         memset( UART1_Manage_Object.Rx_Buffer, 0, UART1_Manage_Object.Rx_Buffer_Length);
+		tttt++;
 
     }
     else if (huart->Instance == UART5)

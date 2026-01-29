@@ -240,6 +240,15 @@ void Gimbal_Device_CAN1_Callback(Struct_CAN_Rx_Buffer *CAN_RxMessage)
             chariot.Booster.Motor_Push_R.CAN_RxCpltCallback(CAN_RxMessage->Data);
         }
         break;
+        case(0x204):
+        {
+            chariot.Booster.Motor_Reload_Linear.CAN_RxCpltCallback(CAN_RxMessage->Data);
+        }
+        break;
+        case(0x205):
+        {
+            chariot.Booster.Motor_Reload_Angle.CAN_RxCpltCallback(CAN_RxMessage->Data);
+        }
 	}
 }
 #endif

@@ -39,10 +39,10 @@ class Class_Booster;
 enum Enum_Booster_Control_Type
 {
     Booster_Control_Type_DISABLE = 0,
-    Booster_Control_Type_NORMAL, 
+    Booster_Control_Type_NORMAL,
     Booster_Control_Type_Push_CALIBRATION,
     Booster_Control_Type_Pull_CALIBRATION,
-    //Booster_Control_Type_Shooting,-- IGNORE --
+    // Booster_Control_Type_Shooting,-- IGNORE --
 };
 
 /**
@@ -51,7 +51,8 @@ enum Enum_Booster_Control_Type
  */
 enum Enum_Shooting_Control_Type
 {
-    Shooting_Control_Type_INIT = 0,
+    Shooting_Control_Type_WAITING= 0,
+    Shooting_Control_Type_INIT,
     Shooting_Control_Type_READY_PRE,
     Shooting_Control_Type_READY,
     Shooting_Control_Type_SHOOTING,
@@ -74,15 +75,15 @@ enum Enum_Reload_Status
  */
 enum Enum_Reload_Control_Type
 {
-    Reload_Control_Type_UNCALIBRATED = 0, //没校准完
-    Reload_Control_Type_INIT,        // 校准完的初始状态
+    Reload_Control_Type_UNCALIBRATED = 0, // 没校准完
+    Reload_Control_Type_INIT,             // 校准完的初始状态
     Reload_Control_Type_PUSHING,          // 上弹推进过程
     Reload_Control_Type_RETRACTING,       // 换弹机构回退过程（给发射机构让路）
     Reload_Control_Type_HOLD,             // 保持当前角度不动状态
 };
 
 /**
- * @brief Specialized, 有限自动机->发射过程状态机 
+ * @brief Specialized, 有限自动机->发射过程状态机
  *
  */
 class Class_FSM_Shooting : public Class_FSM
@@ -97,7 +98,7 @@ public:
 /*
  * @brief Specialized, 有限自动机->换弹机构状态机
  *
-*/
+ */
 class Class_FSM_Reload : public Class_FSM
 {
 public:
@@ -163,8 +164,8 @@ class Class_FSM_Reload_Linear_Calibration : public Class_FSM
 public:
     Class_Booster *Booster;
 
-    float Torque_Threshold = 1500.0f;
-    float speed = 30.0f;
+    float Torque_Threshold = 1100.0f;
+    float speed = 15.0f;
 
     float Angle_Forward = 0.0f;
     float Angle_Backward = 0.0f;
@@ -196,7 +197,7 @@ public:
     Class_FSM_Pull_Calibration FSM_Pull_Calibration;
     friend class Class_FSM_Pull_Calibration;
 
-    //换弹机构直线电机校准
+    // 换弹机构直线电机校准
     Class_FSM_Reload_Linear_Calibration FSM_Reload_Linear_Calibration;
 
     // 裁判系统
@@ -204,7 +205,7 @@ public:
     // 上位机
     Class_MiniPC *MiniPC;
 
-    // 180°舵机->撒放器
+    // 270°舵机->撒放器
     Class_Servo Servo_Trigger;
     Class_Servo Servo_Reload;
 
@@ -221,14 +222,13 @@ public:
     Class_DJI_Motor_GM6020 Motor_Reload_Angle;
     Class_DJI_Motor_C610 Motor_Reload_Linear;
 
-    void Pull_Tension_Control();
+    void Pull_Tension_Control(bool is_first_run);
 
     void Init();
 
     inline Enum_Booster_Control_Type Get_Booster_Control_Type();
     inline Enum_Shooting_Control_Type Get_Shooting_Control_Type();
     inline Enum_Reload_Status Get_Reload_Status();
-   
 
     inline int Get_Target_PushMotor_Angle();
     inline int Get_Target_PullMotor_Angle();
@@ -254,7 +254,6 @@ public:
     inline void Set_Now_position_pull(float __now_position_pull);
     inline void Set_Now_position_reload_linear(float __now_position_reload_linear);
 
-
     void TIM_Calculate_PeriodElapsedCallback();
     void Output();
 
@@ -267,23 +266,23 @@ protected:
     bool Pull_Calibration_Finished = false;
 
     float target_position_push = 0.03f; // 校准完成后push电机目标位置
-    float target_position_pull = 0.9f; // 校准完成后pull电机目标位置
+    float target_position_pull = 0.9f;  // 校准完成后pull电机目标位置
 
-    float now_position_push = 0.0f;// 当前push电机位置
-    float now_position_pull = 0.0f;// 当前pull电机位置
+    float now_position_push = 0.0f; // 当前push电机位置
+    float now_position_pull = 0.0f; // 当前pull电机位置
 
     /*----------------------------reload----------------------------------*/
 
-    //对于6020而言 由于是弧度制 所以要写成 多少多少度 // 180*pi
-    float init_position_reload_angle = 0.0f; // 换弹机构角度电机初始位置
-    float init_position_reload_linear = 0.0f; // 换弹机构线性电机初始位置
-    
-//在初始化的时候直接先把init的值赋给target得了 方便循环赋值 上面的init不用了----------------
+    // 对于6020而言 由于是弧度制 所以要写成 多少多少度 // 180*pi
+    float init_position_reload_angle = 0.0f;  // 校准完成后Angle电机初始位置
+    float init_position_reload_linear = 0.9f; // 校准完成后Linear电机初始位置
 
-    float target_position_reload_angle = 0.0f; // 换弹机构角度电机目标位置
+    // 在初始化的时候直接先把init的值赋给target得了 方便循环赋值 上面的init不用了----------------
+
+    float target_position_reload_angle = 0.0f;  // 换弹机构角度电机目标位置
     float target_position_reload_linear = 0.0f; // 换弹机构线性电机目标位置
 
-    float now_position_reload_angle = 0.0f; // 当前angle电机位置
+    float now_position_reload_angle = 0.0f;  // 当前angle电机位置
     float now_position_reload_linear = 0.0f; // 当前linear电机位置
 
     /*----------------------------servo----------------------------------*/
@@ -291,12 +290,12 @@ protected:
     float tirrger_reset_angle = 90.0f; // 舵机复位角度
 
     float reload_lift_angle = 150.0f; // 舵机换弹抬起角度
-    float reload_drop_angle = 90.0f; // 舵机换弹放下角度
+    float reload_drop_angle = 90.0f;  // 舵机换弹放下角度
 
     /*----------------------------tension----------------------------------*/
     // 拉力相关变量
-    float Measured_Tension = 0; // 测量的拉力值
-    float Target_Tension = 2400.0f;   // 目标的拉力值
+    float Measured_Tension = 0;     // 测量的拉力值
+    float Target_Tension = 25.0f; // 目标的拉力值
 
     // 拉力环相关变量
     float now_tension_value = 0.0f;                            // 当前测得的拉力值
@@ -305,7 +304,7 @@ protected:
 
     // 发射机构状态
     Enum_Booster_Control_Type Booster_Control_Type = Booster_Control_Type_DISABLE;
-    //换弹机构状态
+    // 换弹机构状态
     Enum_Reload_Status Reload_Status = Reload_Status_DISABLE;
 
     // 读写变量-> 无用还没删除

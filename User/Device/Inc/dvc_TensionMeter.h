@@ -34,6 +34,7 @@ public:
 
 protected:
     float Now_Tension = 0.0f;       // 当前拉力值
+    unsigned long Raw_Tension = 0;  //拉力计源数据
     uint32_t Last_Update_Time = 0;  // 上次更新时间，用于判断离线
 
 };
