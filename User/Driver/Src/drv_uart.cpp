@@ -12,6 +12,8 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include "drv_uart.h"
+#include "drv_rs485.h"
+// #include "config.h"
 #include "string.h"
 #include "dvc_dwt.h"
 /* Private macros ------------------------------------------------------------*/
@@ -138,7 +140,7 @@ void TIM_UART_PeriodElapsedCallback()
  * @param Size 长度
  */
 int tttt = 0;
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+extern "C" void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {    
     //停止DMA接收 保护处理过程
     //HAL_UART_DMAStop(huart);
@@ -153,7 +155,18 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
         else
         memset( UART1_Manage_Object.Rx_Buffer, 0, UART1_Manage_Object.Rx_Buffer_Length);
 		tttt++;
-
+    }
+    else if (huart->Instance == USART2) 
+    {
+        // H7 必须：接收后失效 Cache，确保 CPU 读取的是 DMA 搬回来的新数据
+        SCB_InvalidateDCache_by_Addr((uint32_t *)rs485_rx_buf, RS485_RX_SIZE);
+        
+        // 调用我们自己的处理逻辑
+        RS485_Receive_Handler(rs485_rx_buf, Size);
+        
+        // 处理完后，重新开启接收（如果是循环模式则不需要，但为了严谨通常重新开启）
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart2, rs485_rx_buf, RS485_RX_SIZE);
+        __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
     }
     else if (huart->Instance == UART5)
     {

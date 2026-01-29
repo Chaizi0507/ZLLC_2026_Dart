@@ -38,6 +38,7 @@
 #include "tsk_config_and_callback.h"
 #include "drv_bsp-boarda.h"
 #include "drv_tim.h"
+#include "drv_rs485.h"
 #include "dvc_boardc_bmi088.h"
 #include "dvc_dmmotor.h"
 #include "ita_chariot.h"
@@ -399,6 +400,15 @@ void Tension_UART1_Callback(uint8_t *Buffer, uint16_t Length)
 }
 #endif
 
+void RS485_Receive_Handler(uint8_t *pData, uint16_t len)
+{
+    // 比如：打印收到的数据（或者根据协议解析）
+    // Chariot.Update_RS485_Data(pData, len);
+    
+    // 测试回显
+    RS485_Send_DMA(pData, len);
+}
+
 /**
  * @brief USB MiniPC回调函数
  *
@@ -583,6 +593,9 @@ extern "C" void Task_Init()
         CAN_Init(&hfdcan1, Gimbal_Device_CAN1_Callback);
         CAN_Init(&hfdcan2, Gimbal_Device_CAN2_Callback);
         CAN_Init(&hfdcan3, Gimbal_Device_CAN3_Callback);
+
+        //初始化RS485
+        RS485_Init();
 
         //c板陀螺仪spi外设
         SPI_Init(&hspi2,Device_SPI2_Callback);
