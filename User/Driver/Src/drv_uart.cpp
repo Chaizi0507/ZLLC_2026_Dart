@@ -165,7 +165,7 @@ extern "C" void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t S
         RS485_Receive_Handler(rs485_rx_buf, Size);
         
         // 处理完后，重新开启接收（如果是循环模式则不需要，但为了严谨通常重新开启）
-        HAL_UARTEx_ReceiveToIdle_DMA(&huart2, rs485_rx_buf, RS485_RX_SIZE);
+        //HAL_UARTEx_ReceiveToIdle_DMA(&huart2, rs485_rx_buf, RS485_RX_SIZE);
         __HAL_DMA_DISABLE_IT(huart2.hdmarx, DMA_IT_HT);
     }
     else if (huart->Instance == UART5)

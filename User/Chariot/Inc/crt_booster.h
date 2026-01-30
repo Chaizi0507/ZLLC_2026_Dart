@@ -210,7 +210,7 @@ public:
     Class_Servo Servo_Reload;
 
     // 拉力机
-    Class_TensionMeter TensionMeter;
+    Class_TensionMeter TensionMeter = Class_TensionMeter(0x01);
 
     // 发射电机
     Class_DJI_Motor_C620 Motor_Pull;

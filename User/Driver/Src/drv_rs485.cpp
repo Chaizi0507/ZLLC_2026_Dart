@@ -1,5 +1,9 @@
 #include "drv_rs485.h"
+#include "ita_chariot.h"
+#include "tsk_config_and_callback.h"
 #include "config.h"
+
+extern Class_Chariot chariot;
 
 // 放在 D2 指向的内存区（如果 DMA 无法访问 DTCM 请开启此项）
 DMA_BUFFER_ALIGN uint8_t rs485_rx_buf[RS485_RX_SIZE];
@@ -47,18 +51,26 @@ void RS485_Send_DMA(uint8_t *pData, uint16_t len) {
 // }
 //-----------------------------------------------------------------------------------
 
+
 /**
  * @brief RS485的TIM定时器中断发送回调函数
- * 现在暂时没有用到，可以根据需要添加周期性任务
+ * 
  */
 void TIM_RS485_PeriodElapsedCallback()
 {
 #if defined(GIMBAL)
-    static uint8_t mod5 = 0, mod4 = 0, mod20 = 0;
+    static uint8_t mod2 = 0, mod5 = 0, mod4 = 0, mod20 = 0,mod25 = 0,mod50 = 0;
+    mod2++;
     mod5++;
     mod4++;
     mod20++;
+	mod25++;
+	mod50++;
 
+    if(mod2 == 2) // 500Hz
+    {
+        mod2 = 0;
+    }
     if (mod5 == 5) // 200Hz
     {
         mod5 = 0;
@@ -71,5 +83,14 @@ void TIM_RS485_PeriodElapsedCallback()
     {
         mod20 = 0;
     }
+	if (mod25 == 25) //40Hz
+	{
+        chariot.Booster.TensionMeter.Poll();
+		mod25 = 0;
+	}
+	if(mod50 == 50) // 20Hz
+	{
+		mod50 = 0;
+	}		
 #endif
 }

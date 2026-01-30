@@ -23,7 +23,7 @@ extern "C"
 
 /* Exported macros -----------------------------------------------------------*/
 
-#define RS485_RX_SIZE 512
+#define RS485_RX_SIZE 128
 
 // 为 H7 D-Cache 准备的对齐宏
 #if defined ( __ICCARM__ )
@@ -39,6 +39,7 @@ void RS485_Send_DMA(uint8_t *pData, uint16_t len);
 
 // 这个函数可以由你在 tsk_config_and_callback.cpp 中重新实现逻辑
 void RS485_Receive_Handler(uint8_t *pData, uint16_t len);
+void TIM_RS485_PeriodElapsedCallback();
 
 #ifdef __cplusplus
 }

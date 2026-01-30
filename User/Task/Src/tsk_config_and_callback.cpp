@@ -387,26 +387,26 @@ void SuperCAP_UART1_Callback(uint8_t *Buffer, uint16_t Length)
 }
 #endif
 
-/**
- * @brief UART1拉力计回调函数
- *
- * @param Buffer UART1收到的消息
- * @param Length 长度
- */
-#if defined GIMBAL
-void Tension_UART1_Callback(uint8_t *Buffer, uint16_t Length)
-{
-    chariot.Booster.TensionMeter.UART_RxCpltCallback(Buffer, Length);
-}
-#endif
+// /**
+//  * @brief UART1拉力计回调函数
+//  *
+//  * @param Buffer UART1收到的消息
+//  * @param Length 长度
+//  */
+// #if defined GIMBAL
+// void Tension_UART1_Callback(uint8_t *Buffer, uint16_t Length)
+// {
+//     chariot.Booster.TensionMeter.UART_RxCpltCallback(Buffer, Length);
+// }
+// #endif
 
-void RS485_Receive_Handler(uint8_t *pData, uint16_t len)
+extern "C" void RS485_Receive_Handler(uint8_t *pData, uint16_t len)
 {
-    // 比如：打印收到的数据（或者根据协议解析）
-    // Chariot.Update_RS485_Data(pData, len);
-    
+    // 只要有数据进来，就丢给对象去解析
+    // chariot.Booster.TensionMeter.Data_Process(pData, len);
+    chariot.Booster.TensionMeter.UART_RxCpltCallback(pData, len);
     // 测试回显
-    RS485_Send_DMA(pData, len);
+    //RS485_Send_DMA(pData, len);
 }
 
 /**
@@ -525,8 +525,10 @@ void Task1ms_TIM5_Callback()
         chariot.TIM_Calculate_PeriodElapsedCallback();
         
     /****************************** 驱动层回调函数 1ms *****************************************/ 
-        //统一打包发送
+        //CAN统一打包发送
         TIM_CAN_PeriodElapsedCallback();
+        //RS485统一发送(dart)
+        TIM_RS485_PeriodElapsedCallback();
         
         static int mod5 = 0,mod100 = 0,mod68 = 0;
         mod5++;
@@ -594,9 +596,6 @@ extern "C" void Task_Init()
         CAN_Init(&hfdcan2, Gimbal_Device_CAN2_Callback);
         CAN_Init(&hfdcan3, Gimbal_Device_CAN3_Callback);
 
-        //初始化RS485
-        RS485_Init();
-
         //c板陀螺仪spi外设
         SPI_Init(&hspi2,Device_SPI2_Callback);
         //磁力计iic外设
@@ -612,8 +611,8 @@ extern "C" void Task_Init()
         USB_Init(&MiniPC_USB_Manage_Object,MiniPC_USB_Callback);
         //上位机串口
         UART_Init(&huart8, MiniPC_UART_Callback, 56);
-        //拉力机串口
-        UART_Init(&huart1, Tension_UART1_Callback, 32);
+        //初始化拉力机RS485
+        RS485_Init();
 
 
     #endif

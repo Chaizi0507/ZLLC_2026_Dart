@@ -169,6 +169,56 @@
           <WinNumber>1</WinNumber>
           <ItemText>ttttt,0x0A</ItemText>
         </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>ttest</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>test_pp</ItemText>
+        </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>test_len,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>7</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Raw_Value,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>8</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>pData,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>9</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>*pData</ItemText>
+        </Ww>
+        <Ww>
+          <count>10</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>b1</ItemText>
+        </Ww>
+        <Ww>
+          <count>11</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>b2</ItemText>
+        </Ww>
+        <Ww>
+          <count>12</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>b3</ItemText>
+        </Ww>
+        <Ww>
+          <count>13</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>b4</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -189,60 +239,50 @@
         <Ww>
           <count>3</count>
           <WinNumber>2</WinNumber>
-          <ItemText>\\ZLLC_2026\../User/Task/Src/tsk_config_and_callback.cpp\chariot.Booster.TensionMeter.Now_Tension</ItemText>
+          <ItemText>target_position_b</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>2</WinNumber>
-          <ItemText>\\ZLLC_2026\../User/Task/Src/tsk_config_and_callback.cpp\chariot.Booster.TensionMeter.Raw_Tension</ItemText>
+          <ItemText>Motor_Reload_6020_Anlge_P_test</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>2</WinNumber>
-          <ItemText>target_position_b</ItemText>
+          <ItemText>Motor_Reload_6020_Anlge_I_test</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Motor_Reload_6020_Anlge_P_test</ItemText>
+          <ItemText>Motor_Reload_6020_Omega_P_test</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Motor_Reload_6020_Anlge_I_test</ItemText>
+          <ItemText>Motor_Reload_6020_Omega_I_test</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Motor_Reload_6020_Omega_P_test</ItemText>
+          <ItemText>CAN1_0x1fe_Tx_Data</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Motor_Reload_6020_Omega_I_test</ItemText>
+          <ItemText>test_allow_fire</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>2</WinNumber>
-          <ItemText>CAN1_0x1fe_Tx_Data</ItemText>
+          <ItemText>test_allow_fire</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>2</WinNumber>
-          <ItemText>test_allow_fire</ItemText>
-        </Ww>
-        <Ww>
-          <count>12</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>test_allow_fire</ItemText>
-        </Ww>
-        <Ww>
-          <count>13</count>
-          <WinNumber>2</WinNumber>
           <ItemText>rs485_rx_buf[RS485_RX_SIZE]</ItemText>
         </Ww>
         <Ww>
-          <count>14</count>
+          <count>12</count>
           <WinNumber>2</WinNumber>
           <ItemText>rs485_rx_buf</ItemText>
         </Ww>
@@ -873,7 +913,7 @@
 
   <Group>
     <GroupName>Application/User/Core</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
