@@ -78,8 +78,10 @@ void Class_TensionMeter::Data_Process(uint8_t *pData, uint16_t len)
                 uint8_t b3 = pData[i+5]; 
                 uint8_t b4 = pData[i+6]; 
 
+                //顺序组合成一个32位整数（注意字节顺序）
                 Raw_Value = (int32_t)((b1 << 24) | (b2 << 16) | (b3 << 8) | b4);
-                float Current_Raw = (float)Raw_Value * 0.000015874f; 
+                // 转换为实际拉力值，单位g（根据测试出来的比例系数） 可能不准 暂时用这个
+                float Current_Raw = (float)Raw_Value * 0.00015874f; 
 
                 // --- 3阶中值滤波 (静态变量实现) ---
                 static float buf[3] = {0};
@@ -120,7 +122,7 @@ void Class_TensionMeter::Data_Process(uint8_t *pData, uint16_t len)
  */
 void Class_TensionMeter::UART_RxCpltCallback(uint8_t *Rx_Data, uint16_t Length)
 {
-    // 这里我们直接调用你觉得很稳的那个 Data_Process 逻辑
+    // 这里直接调用 Data_Process 逻辑
     this->Data_Process(Rx_Data, Length);
 }
 

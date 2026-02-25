@@ -139,7 +139,7 @@ void TIM_UART_PeriodElapsedCallback()
  * @param huart UART编号
  * @param Size 长度
  */
-int tttt = 0;
+//int tttt = 0;
 extern "C" void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {    
     //停止DMA接收 保护处理过程
@@ -154,7 +154,7 @@ extern "C" void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t S
             UART1_Manage_Object.Callback_Function(UART1_Manage_Object.Rx_Buffer, Size);
         else
         memset( UART1_Manage_Object.Rx_Buffer, 0, UART1_Manage_Object.Rx_Buffer_Length);
-		tttt++;
+		//tttt++;
     }
     else if (huart->Instance == USART2) 
     {

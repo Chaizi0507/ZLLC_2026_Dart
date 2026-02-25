@@ -1017,32 +1017,32 @@ void Class_Booster::Output()
  */
 void Class_Booster::TIM_Calculate_PeriodElapsedCallback()
 {
-    // 拉力机数值更新
-    Measured_Tension = TensionMeter.Get_Tension();
+    // // 拉力机数值更新
+    // Measured_Tension = TensionMeter.Get_Tension();
 
-    // 皮筋校准
-    FSM_Push_Calibration.Push_Calibration_TIM_Status_PeriodElapsedCallback();
+    // // 皮筋校准
+    // FSM_Push_Calibration.Push_Calibration_TIM_Status_PeriodElapsedCallback();
 
-    // // 拉力校准
-    FSM_Pull_Calibration.Pull_Calibration_TIM_Status_PeriodElapsedCallback();
+    // // // 拉力校准
+    // FSM_Pull_Calibration.Pull_Calibration_TIM_Status_PeriodElapsedCallback();
 
-    // 直线电机校准
-    // FSM_Reload_Linear_Calibration.Linear_Calibration_TIM_Status_PeriodElapsedCallback();
+    // // 直线电机校准
+    // // FSM_Reload_Linear_Calibration.Linear_Calibration_TIM_Status_PeriodElapsedCallback();
 
-    // 发射状态机
-    FSM_Shooting.Shooting_TIM_Status_PeriodElapsedCallback();
+    // // 发射状态机
+    // FSM_Shooting.Shooting_TIM_Status_PeriodElapsedCallback();
 
-    // 换弹状态机
-    // FSM_Reload.Reload_TIM_Status_PeriodElapsedCallback();
+    // // 换弹状态机
+    // // FSM_Reload.Reload_TIM_Status_PeriodElapsedCallback();
 
-    Output();
+    // Output();
 
-    // PID输出
-    Motor_Pull.TIM_PID_PeriodElapsedCallback();
-    Motor_Push_L.TIM_PID_PeriodElapsedCallback();
-    Motor_Push_R.TIM_PID_PeriodElapsedCallback();
-    // Motor_Reload_Angle.TIM_PID_PeriodElapsedCallback();
-    //  Motor_Reload_Linear.TIM_PID_PeriodElapsedCallback();
+    // // PID输出
+    // Motor_Pull.TIM_PID_PeriodElapsedCallback();
+    // Motor_Push_L.TIM_PID_PeriodElapsedCallback();
+    // Motor_Push_R.TIM_PID_PeriodElapsedCallback();
+    // // Motor_Reload_Angle.TIM_PID_PeriodElapsedCallback();
+    // //  Motor_Reload_Linear.TIM_PID_PeriodElapsedCallback();
 }
 
 /************************ COPYRIGHT(C) USTC-ROBOWALKER **************************/
