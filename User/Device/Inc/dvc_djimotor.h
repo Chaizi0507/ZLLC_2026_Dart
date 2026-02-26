@@ -137,6 +137,8 @@ public:
     inline Enum_DJI_Motor_Status Get_DJI_Motor_Status();
     inline float Get_Now_Angle();
     inline float Get_Now_Radian();
+    inline uint16_t Get_Now_Encoder_Single();
+    inline float Get_Now_Radian_Single();
     inline float Get_Now_Omega_Angle();
     inline float Get_Now_Omega_Radian();
     inline float Get_Now_Torque();
@@ -157,6 +159,8 @@ public:
     inline void Set_DJI_Motor_Control_Method(Enum_DJI_Motor_Control_Method __DJI_Motor_Control_Method);
     inline void Set_Target_Angle(float __Target_Angle);
     inline void Set_Target_Radian(float __Target_Radian);
+    void Set_Target_SingleTurn_Encoder_Nearest(uint16_t __Target_Single_Encoder);
+    void Set_Target_SingleTurn_Radian_Nearest(float __Target_Single_Radian);
     inline void Set_Target_Omega_Angle(float __Target_Omega_Angle);
     inline void Set_Target_Omega_Radian(float __Target_Omega_Radian);
     inline void Set_Target_Torque(float __Target_Torque);
@@ -214,6 +218,8 @@ protected:
     float Transform_Omega = 0.0f;
     float Transform_Torque = 0.0f;
     float Transform_Target_Omega = 0.0f;
+    uint16_t Now_Encoder_Single = 0;
+    float Now_Radian_Single = 0.0f;
 
     // 当前时刻的电机接收flag
     uint32_t Flag = 0;
@@ -553,6 +559,16 @@ float Class_DJI_Motor_GM6020::Get_Now_Angle()
 float Class_DJI_Motor_GM6020::Get_Now_Radian()
 {
     return (Data.Now_Radian);
+}
+
+uint16_t Class_DJI_Motor_GM6020::Get_Now_Encoder_Single()
+{
+    return (Now_Encoder_Single);
+}
+
+float Class_DJI_Motor_GM6020::Get_Now_Radian_Single()
+{
+    return (Now_Radian_Single);
 }
 
 /**

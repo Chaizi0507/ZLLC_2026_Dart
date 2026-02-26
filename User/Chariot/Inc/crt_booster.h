@@ -80,6 +80,7 @@ enum Enum_Reload_Control_Type
     Reload_Control_Type_PUSHING,          // 上弹推进过程
     Reload_Control_Type_RETRACTING,       // 换弹机构回退过程（给发射机构让路）
     Reload_Control_Type_HOLD,             // 保持当前角度不动状态
+    Reload_Control_Type_Test,             // 测试用状态
 };
 
 /**
@@ -274,7 +275,7 @@ protected:
     /*----------------------------reload----------------------------------*/
 
     // 对于6020而言 由于是弧度制 所以要写成 多少多少度 // 180*pi
-    float init_position_reload_angle = 0.0f;  // 校准完成后Angle电机初始位置
+    float init_position_reload_angle = 60 * PI / 180.0f;  // 校准完成后Angle电机初始位置
     float init_position_reload_linear = 0.9f; // 校准完成后Linear电机初始位置
 
     // 在初始化的时候直接先把init的值赋给target得了 方便循环赋值 上面的init不用了----------------
@@ -286,8 +287,8 @@ protected:
     float now_position_reload_linear = 0.0f; // 当前linear电机位置
 
     /*----------------------------servo----------------------------------*/
-    float tirrger_fire_angle = 235.0f; // 舵机发射角度
-    float tirrger_reset_angle = 90.0f; // 舵机复位角度
+    float tirrger_fire_angle = 255.0f; // 舵机发射角度
+    float tirrger_reset_angle = 120.0f; // 舵机复位角度
 
     float reload_lift_angle = 150.0f; // 舵机换弹抬起角度
     float reload_drop_angle = 90.0f;  // 舵机换弹放下角度
@@ -295,7 +296,7 @@ protected:
     /*----------------------------tension----------------------------------*/
     // 拉力相关变量
     float Measured_Tension = 0;     // 测量的拉力值
-    float Target_Tension = 25.0f; // 目标的拉力值
+    float Target_Tension = 30000.0f; // 目标的拉力值，单位g
 
     // 拉力环相关变量
     float now_tension_value = 0.0f;                            // 当前测得的拉力值

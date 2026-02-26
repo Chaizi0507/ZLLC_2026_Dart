@@ -287,12 +287,14 @@ void Class_DJI_Motor_GM6020::Data_Process()
     }
     Data.Total_Encoder = Data.Total_Round * Encoder_Num_Per_Round + tmp_encoder + Encoder_Offset;
 
-    // 计算电机本身信息
-    //  Data.Now_Angle = (float)Data.Total_Encoder / (float)Encoder_Num_Per_Round * 360.0f;
-    //  Data.Now_Radian = (float)Data.Total_Encoder / (float)Encoder_Num_Per_Round * 2.0f * PI;
+    // 保存单圈坐标（0~8191 / 0~2PI）
+    Now_Encoder_Single = tmp_encoder;
+    Now_Radian_Single = (float)tmp_encoder / (float)Encoder_Num_Per_Round * 2.0f * PI;
 
-    Data.Now_Angle = (float)tmp_encoder / (float)Encoder_Num_Per_Round * 360.0f;
-    Data.Now_Radian = (float)tmp_encoder / (float)Encoder_Num_Per_Round * 2.0f * PI;
+    // 计算电机本身信息
+    // 多圈坐标：用于连续角度控制（例如换弹每次 +60°）
+    Data.Now_Angle = (float)Data.Total_Encoder / (float)Encoder_Num_Per_Round * 360.0f;
+    Data.Now_Radian = (float)Data.Total_Encoder / (float)Encoder_Num_Per_Round * 2.0f * PI;
     // Data.Now_Omega_Angle = (float)(Data.Total_Encoder - Data.Pre_Total_Encoder)/8191.0f*60.0f*1000.0f;  //rpm
 
     kalman_update(&Kf_Omega, (float)tmp_omega);
@@ -327,6 +329,42 @@ void Class_DJI_Motor_GM6020::Data_Process()
     Data.Pre_Angle = Data.Now_Angle;
     if (Start_Falg == 0)
         Start_Falg = 1;
+}
+
+void Class_DJI_Motor_GM6020::Set_Target_SingleTurn_Encoder_Nearest(uint16_t __Target_Single_Encoder)
+{
+    const int32_t encoder_per_round = (int32_t)Encoder_Num_Per_Round;
+    const int32_t target_single = (int32_t)(__Target_Single_Encoder % Encoder_Num_Per_Round);
+
+    // 将单圈目标映射到“离当前多圈位置最近”的那一圈
+    float kf = ((float)Data.Total_Encoder - (float)target_single) / (float)encoder_per_round;
+    int32_t k = (int32_t)((kf >= 0.0f) ? (kf + 0.5f) : (kf - 0.5f));
+    int32_t target_total_encoder = k * encoder_per_round + target_single;
+
+    Target_Radian = (float)target_total_encoder / (float)encoder_per_round * 2.0f * PI;
+    Target_Angle = Target_Radian * 180.0f / PI;
+}
+
+void Class_DJI_Motor_GM6020::Set_Target_SingleTurn_Radian_Nearest(float __Target_Single_Radian)
+{
+    // 归一化到 [0, 2PI)
+    while (__Target_Single_Radian < 0.0f)
+    {
+        __Target_Single_Radian += 2.0f * PI;
+    }
+    while (__Target_Single_Radian >= 2.0f * PI)
+    {
+        __Target_Single_Radian -= 2.0f * PI;
+    }
+
+    float encoder_f = __Target_Single_Radian / (2.0f * PI) * (float)Encoder_Num_Per_Round;
+    uint16_t target_single_encoder = (uint16_t)(encoder_f + 0.5f);
+    if (target_single_encoder >= Encoder_Num_Per_Round)
+    {
+        target_single_encoder = 0;
+    }
+
+    Set_Target_SingleTurn_Encoder_Nearest(target_single_encoder);
 }
 
 /**
@@ -410,7 +448,7 @@ void Class_DJI_Motor_GM6020::TIM_PID_PeriodElapsedCallback()
     case (DJI_Motor_Control_Method_ANGLE):
     {
         PID_Angle.Set_Target(Target_Radian);
-        PID_Angle.Set_Now(Transform_Angle); //这里用弧度制 // 转换后的角度，右手螺旋定律，标准坐标系
+        PID_Angle.Set_Now(Data.Now_Radian); //这里用弧度制 // 转换后的角度，右手螺旋定律，标准坐标系
         PID_Angle.TIM_Adjust_PeriodElapsedCallback();
 
         Target_Omega_Radian = PID_Angle.Get_Out();
@@ -450,7 +488,7 @@ void Class_DJI_Motor_GM6020::TIM_SMC_PeriodElapsedCallback()
     default:
     {
         SMC_Control.Set_Target(Target_Angle);
-        SMC_Control.Set_Now(Transform_Angle, Transform_Omega);
+        SMC_Control.Set_Now(Data.Now_Radian, Data.Now_Omega_Radian);
 
         // SMC_Control.TIM_Adjust_PeriodElapsedCallback();
         Out = SMC_Control.Get_Out();
