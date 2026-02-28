@@ -146,8 +146,8 @@ class Class_FSM_Pull_Calibration : public Class_FSM
 public:
     Class_Booster *Booster;
 
-    float Torque_Threshold = 1500.0f;
-    float speed = 30.0f;
+    float Torque_Threshold = 1700.0f;
+    float speed = 40.0f;
 
     float Angle_Forward = 0.0f;
     float Angle_Backward = 0.0f;
@@ -267,7 +267,7 @@ protected:
     bool Pull_Calibration_Finished = false;
 
     float target_position_push = 0.03f; // 校准完成后push电机目标位置
-    float target_position_pull = 0.9f;  // 校准完成后pull电机目标位置
+    float target_position_pull = 0.5f;  // 校准完成后pull电机目标位置
 
     float now_position_push = 0.0f; // 当前push电机位置
     float now_position_pull = 0.0f; // 当前pull电机位置
@@ -281,13 +281,13 @@ protected:
     // 在初始化的时候直接先把init的值赋给target得了 方便循环赋值 上面的init不用了----------------
 
     float target_position_reload_angle = 0.0f;  // 换弹机构角度电机目标位置
-    float target_position_reload_linear = 0.0f; // 换弹机构线性电机目标位置
+    float target_position_reload_linear = 0.96f; // 换弹机构线性电机目标位置
 
     float now_position_reload_angle = 0.0f;  // 当前angle电机位置
     float now_position_reload_linear = 0.0f; // 当前linear电机位置
 
     /*----------------------------servo----------------------------------*/
-    float tirrger_fire_angle = 255.0f; // 舵机发射角度
+    float tirrger_fire_angle = 260.0f; // 舵机发射角度
     float tirrger_reset_angle = 120.0f; // 舵机复位角度
 
     float reload_lift_angle = 150.0f; // 舵机换弹抬起角度
@@ -296,7 +296,7 @@ protected:
     /*----------------------------tension----------------------------------*/
     // 拉力相关变量
     float Measured_Tension = 0;     // 测量的拉力值
-    float Target_Tension = 30000.0f; // 目标的拉力值，单位g
+    float Target_Tension = 32000.0f; // 目标的拉力值，单位g
 
     // 拉力环相关变量
     float now_tension_value = 0.0f;                            // 当前测得的拉力值
