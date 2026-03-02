@@ -270,8 +270,14 @@ void Class_DJI_Motor_GM6020::Data_Process()
     Math_Endian_Reverse_16((void *)&tmp_buffer->Torque_Reverse, (void *)&tmp_torque);
     Math_Endian_Reverse_16((void *)&tmp_buffer->Temperature, (void *)&tmp_temperature);
 
+    //处理异常
+     if(tmp_encoder > Encoder_Num_Per_Round)
+     {
+        tmp_encoder = 0;
+     }
+
     // 计算圈数与总编码器值
-    if (Start_Falg == 1)
+    if (Start_Falg == 1 && Data.Pre_Encoder != 0)
     {
         delta_encoder = tmp_encoder - Data.Pre_Encoder;
         if (delta_encoder < -Encoder_Num_Per_Round / 2)
@@ -328,7 +334,9 @@ void Class_DJI_Motor_GM6020::Data_Process()
     Data.Pre_Total_Encoder = Data.Total_Encoder;
     Data.Pre_Angle = Data.Now_Angle;
     if (Start_Falg == 0)
+    {
         Start_Falg = 1;
+    }
 }
 
 void Class_DJI_Motor_GM6020::Set_Target_SingleTurn_Encoder_Nearest(uint16_t __Target_Single_Encoder)
