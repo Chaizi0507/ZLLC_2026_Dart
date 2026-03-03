@@ -168,7 +168,7 @@ public:
     Class_Booster *Booster;
 
     float Torque_Threshold = 1100.0f;
-    float speed = 15.0f;
+    float speed = 20.0f;
 
     float Angle_Forward = 0.0f;
     float Angle_Backward = 0.0f;
@@ -268,7 +268,7 @@ protected:
     // bool Push_Calibration_Finished = false;
     // bool Pull_Calibration_Finished = false;
 
-    float target_position_push = 0.03f; // 校准完成后push电机目标位置
+    float target_position_push = 0.003f; // 校准完成后push电机目标位置
     float target_position_pull = 0.5f;  // 校准完成后pull电机目标位置
 
     float now_position_push = 0.0f; // 当前push电机位置
@@ -278,7 +278,7 @@ protected:
 
     // 对于6020而言 由于是弧度制 所以要写成 多少多少度 // 180*pi
     float init_position_reload_angle = 80.0f * PI / 180.0f;  // 校准完成后Angle电机初始位置
-    float init_position_reload_linear = 0.95f; // 校准完成后Linear电机初始位置
+    float init_position_reload_linear = 0.92f; // 校准完成后Linear电机初始位置
 
     // 在初始化的时候直接先把init的值赋给target得了 方便循环赋值 上面的init不用了----------------
 
