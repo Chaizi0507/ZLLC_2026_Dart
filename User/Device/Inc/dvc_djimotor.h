@@ -192,6 +192,12 @@ public:
 protected:
     // 初始化相关变量
 
+    // 接收稳定计数（用于上电前几帧屏蔽）
+    uint8_t Rx_Stable_Count = 0;
+
+    // 首次反馈后是否已做 target=now 对齐
+    uint8_t Angle_Target_Synced = 0;
+
     // 绑定的CAN
     Struct_CAN_Manage_Object *CAN_Manage_Object;
     // 收数据绑定的CAN ID, C6系列0x201~0x208, GM系列0x205~0x20b

@@ -56,6 +56,7 @@ enum Enum_Shooting_Control_Type
     Shooting_Control_Type_READY_PRE,
     Shooting_Control_Type_READY,
     Shooting_Control_Type_SHOOTING,
+    Shooting_Control_Type_SHOOTING_FINISHED,
 };
 
 /*
@@ -77,6 +78,7 @@ enum Enum_Reload_Control_Type
 {
     Reload_Control_Type_UNCALIBRATED = 0, // 没校准完
     Reload_Control_Type_INIT,             // 校准完的初始状态
+    Reload_Control_Type_WAITING,          //等待上膛滑块到位
     Reload_Control_Type_PUSHING,          // 上弹推进过程
     Reload_Control_Type_RETRACTING,       // 换弹机构回退过程（给发射机构让路）
     Reload_Control_Type_HOLD,             // 保持当前角度不动状态
@@ -275,8 +277,8 @@ protected:
     /*----------------------------reload----------------------------------*/
 
     // 对于6020而言 由于是弧度制 所以要写成 多少多少度 // 180*pi
-    float init_position_reload_angle = 60 * PI / 180.0f;  // 校准完成后Angle电机初始位置
-    float init_position_reload_linear = 0.9f; // 校准完成后Linear电机初始位置
+    float init_position_reload_angle = 80.0f * PI / 180.0f;  // 校准完成后Angle电机初始位置
+    float init_position_reload_linear = 0.95f; // 校准完成后Linear电机初始位置
 
     // 在初始化的时候直接先把init的值赋给target得了 方便循环赋值 上面的init不用了----------------
 
