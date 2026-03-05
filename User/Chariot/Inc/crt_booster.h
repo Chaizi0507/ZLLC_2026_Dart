@@ -148,7 +148,7 @@ class Class_FSM_Pull_Calibration : public Class_FSM
 public:
     Class_Booster *Booster;
 
-    float Torque_Threshold = 1700.0f;
+    float Torque_Threshold = 1500.0f;
     float speed = 40.0f;
 
     float Angle_Forward = 0.0f;
@@ -268,7 +268,7 @@ protected:
     // bool Push_Calibration_Finished = false;
     // bool Pull_Calibration_Finished = false;
 
-    float target_position_push = 0.003f; // 校准完成后push电机目标位置
+    float target_position_push = 0.f; // 校准完成后push电机目标位置
     float target_position_pull = 0.5f;  // 校准完成后pull电机目标位置
 
     float now_position_push = 0.0f; // 当前push电机位置

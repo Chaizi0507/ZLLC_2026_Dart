@@ -15,8 +15,18 @@
 
 /* Private macros ------------------------------------------------------------*/
 
+int a,b,c,d;
+volatile int e,f,g,h;
+
+int time_test_waiting = 0;
+int time_test_pushing = 0;
+
+
 float test_Motor_Reload_Linear_Target = 0.5f; // 换弹直线电机测试目标位置
 float test_reload_servo_angle = 220.0f; // 舵机测试目标角度
+
+//push电机target能够容忍的误差
+float push_target_tolerance = 0.014f;
 
 // 校准是否完成相关标志位
 bool Push_Calibration_Finished = false;
@@ -31,6 +41,9 @@ int test_allow_fire = 0; // 测试用，允许发射标志位
 // 已发镖数量
 static int dart_fired_count = 0;
 static int last_dart_fired_count = 0;
+
+// READY_PRE：push到位事件时间戳（-1 表示尚未到位）
+static int ready_pre_push_reached_time = -1;
 
 // 拉力误差连续满足阈值的累计时间（单位：ms）
 uint16_t tension_in_range_time_ms = 0;
@@ -548,22 +561,28 @@ void Class_FSM_Shooting::Shooting_TIM_Status_PeriodElapsedCallback()
         }
         // 继续跑这个，以免时间不够，没到位置（因为之前的NORMAL也在跑）这个不确定，再说
 
-        if (fabs(Booster->Get_Now_position_push() - Booster->Get_Target_position_push()) < 0.001f && Status[Now_Status_Serial].Time > 1200) // 等待500ms 让撒放器扣住
+        if (fabs(Booster->Get_Now_position_push() - Booster->Get_Target_position_push()) < push_target_tolerance)
+        {
+            // 撒放器闭合已经在跑校准过程中完成，但是由于循环跑状态机，所以要再设置一次
+            Booster->Servo_Trigger.Set_Target_Angle(Booster->tirrger_reset_angle); // 舵机扣住
+            ready_pre_push_reached_time = Status[Now_Status_Serial].Time;// 记录上膛滑块到位的时间戳
+        }
+
+        if (fabs(Booster->Get_Now_position_push() - Booster->Get_Target_position_push()) < push_target_tolerance && ready_pre_push_reached_time > 6000) // 等待500ms 让撒放器扣住
         {
             // 撒放器闭合已经在跑校准过程中完成，但是由于循环跑状态机，所以要再设置一次
             Booster->Servo_Trigger.Set_Target_Angle(Booster->tirrger_reset_angle); // 舵机扣住
 
-            if (Status[Now_Status_Serial].Time > 2000) // 等待350ms,扣住之后，上膛电机往上走
-            {
-                Booster->Motor_Push_L.Set_Target_Radian(0.97f);
-                Booster->Motor_Push_R.Set_Target_Radian(0.97f);
-            }
+            Booster->Motor_Push_L.Set_Target_Radian(0.95f);
+            Booster->Motor_Push_R.Set_Target_Radian(0.95f);
+            
         }
 
         // 写一个判断持续监测上膛滑块是否就位
         // 条件为：整体booster处于Normal状态,上膛滑块就位(位置>0.92)，且裁判系统允许发射
         if (Booster->Get_Booster_Control_Type() == Booster_Control_Type_NORMAL 
-        && Booster->Get_Now_position_push() > 0.94f 
+        && Booster->Get_Now_position_push() > 0.9f 
+        && Booster->Get_Reload_Status() == Reload_Status_FINISHED
         && Referee_Allow_Shoot)
         {
             Set_Status(Shooting_Control_Type_READY); // 进入 READY 状态
@@ -658,11 +677,11 @@ void Class_FSM_Shooting::Shooting_TIM_Status_PeriodElapsedCallback()
         Booster->Motor_Push_L.Set_Target_Radian(0.97f);
         Booster->Motor_Push_R.Set_Target_Radian(0.97f);
 
-        Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
-        Booster->Motor_Pull.Set_Target_Radian(0.90f);
+        // Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+        // Booster->Motor_Pull.Set_Target_Radian(0.90f);
 
         // 在此状态卡住，等待裁判系统允许下一次发射的信号，同时等待上膛完成
-        if (Referee_Allow_Shoot && Booster->Get_Reload_Status() == Reload_Status_FINISHED)
+        if (Referee_Allow_Shoot && (Booster->Get_Reload_Status() == Reload_Status_FINISHED))
         {
             // 重置状态机，回到 READY_PRE 状态，准备下一次发射
             Set_Status(Shooting_Control_Type_READY_PRE);
@@ -670,6 +689,7 @@ void Class_FSM_Shooting::Shooting_TIM_Status_PeriodElapsedCallback()
 
     }
     }
+    Shooting_Control_Type = static_cast<Enum_Shooting_Control_Type>(Now_Status_Serial);
 }
 
 void Class_FSM_Reload::Reload_TIM_Status_PeriodElapsedCallback()
@@ -707,9 +727,14 @@ void Class_FSM_Reload::Reload_TIM_Status_PeriodElapsedCallback()
         // 舵机在一定角度
         Booster->Servo_Reload.Set_Target_Angle(Booster->reload_lift_angle);
 
+        a = (Booster->Get_Booster_Control_Type() == Booster_Control_Type_NORMAL);
+        b = (Booster->Get_Reload_Status() == Reload_Status_FINISHED);
+        c = ((dart_fired_count - last_dart_fired_count) > 0);
+        d = Referee_Allow_Shoot;
+
         if (Booster->Get_Booster_Control_Type() == Booster_Control_Type_NORMAL  
         /*&& Booster->Get_Shooting_Control_Type() == Shooting_Control_Type_READY*/
-        && dart_fired_count - last_dart_fired_count > 0 
+        && (dart_fired_count - last_dart_fired_count > 0) 
         && Booster->Get_Shooting_Control_Type() == Shooting_Control_Type_SHOOTING_FINISHED 
         && Referee_Allow_Shoot) // 有发射动作发生
         {
@@ -722,20 +747,25 @@ void Class_FSM_Reload::Reload_TIM_Status_PeriodElapsedCallback()
     break;
     case (Reload_Control_Type_WAITING):
     {
+        time_test_waiting++;
         //先让上膛滑块下落到一个位置，保持不动
         Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
         Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
-        Booster->Motor_Push_L.Set_Target_Radian(0.1f);
-        Booster->Motor_Push_R.Set_Target_Radian(0.1f);
-
-        Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
-        Booster->Motor_Pull.Set_Target_Radian(0.95f);
+        Booster->Motor_Push_L.Set_Target_Radian(0.05f);
+        Booster->Motor_Push_R.Set_Target_Radian(0.05f);
+        
+        // Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+        // Booster->Motor_Pull.Set_Target_Radian(0.95f);
+        e = Booster->Get_Booster_Control_Type() == Booster_Control_Type_NORMAL;
+        f = Booster->Get_Shooting_Control_Type() == Shooting_Control_Type_SHOOTING_FINISHED;
+        g = Referee_Allow_Shoot;
+        h = fabs(Booster->Get_Now_position_push() - 0.05f) < 0.03f;
 
         // 等待状态：保持不动，直到满足条件进入下一状态
         if (Booster->Get_Booster_Control_Type() == Booster_Control_Type_NORMAL  
         && Booster->Get_Shooting_Control_Type() == Shooting_Control_Type_SHOOTING_FINISHED 
         && Referee_Allow_Shoot
-        && fabs(Booster->Get_Now_position_push() - 0.1f) < 0.03f /*达到上膛滑块位置*/ ) 
+        && fabs(Booster->Get_Now_position_push() - 0.05f) < 0.03f /*达到上膛滑块位置*/ ) 
         {
             Set_Status(Reload_Control_Type_PUSHING);
         }
@@ -743,6 +773,7 @@ void Class_FSM_Reload::Reload_TIM_Status_PeriodElapsedCallback()
     break;
     case (Reload_Control_Type_PUSHING):
     {
+        time_test_pushing++;
         // 只在进入该状态的第一次循环执行
         if (Status[Now_Status_Serial].Time == 1)
         {
@@ -861,6 +892,7 @@ void Class_FSM_Reload::Reload_TIM_Status_PeriodElapsedCallback()
     }
     break;
     }
+    Reload_Control_Type = static_cast<Enum_Reload_Control_Type>(Now_Status_Serial);
 }
 
 // 测试参数
