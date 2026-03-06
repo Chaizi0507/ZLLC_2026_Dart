@@ -231,6 +231,7 @@ public:
 
     inline Enum_Booster_Control_Type Get_Booster_Control_Type();
     inline Enum_Shooting_Control_Type Get_Shooting_Control_Type();
+    inline Enum_Reload_Control_Type Get_Reload_Control_Type();
     inline Enum_Reload_Status Get_Reload_Status();
 
     inline int Get_Target_PushMotor_Angle();
@@ -246,7 +247,6 @@ public:
     inline void Set_Booster_Control_Type(Enum_Booster_Control_Type __Booster_Control_Type);
     inline void Set_Shooting_Control_Type(Enum_Shooting_Control_Type __Shooting_Control_Type);
     inline void Set_Reload_Status(Enum_Reload_Status __Reload_Status);
-
     inline void Set_Target_PushMotor_Angle(float __Target_PushMotor_Angle);
     inline void Set_Target_PullMotor_Angle(float __Target_PullMotor_Angle);
     inline void Set_Measured_Tension(int __Measured_Tension);
@@ -344,6 +344,11 @@ inline Enum_Shooting_Control_Type Class_Booster::Get_Shooting_Control_Type()
 Enum_Reload_Status Class_Booster::Get_Reload_Status()
 {
     return Reload_Status;
+}
+
+inline Enum_Reload_Control_Type Class_Booster::Get_Reload_Control_Type()
+{
+    return (FSM_Reload.Reload_Control_Type);
 }
 
 int Class_Booster::Get_Target_PushMotor_Angle()

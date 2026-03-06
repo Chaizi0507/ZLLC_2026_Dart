@@ -21,6 +21,10 @@ volatile int e,f,g,h;
 int time_test_waiting = 0;
 int time_test_pushing = 0;
 
+//换弹次数
+int reload_count = 0;
+// Shooting 状态机上次已消费的换弹次数（用于确保每完成一次换弹才放行一次）
+static int last_reload_count_for_shooting_ready = 0;
 
 float test_Motor_Reload_Linear_Target = 0.5f; // 换弹直线电机测试目标位置
 float test_reload_servo_angle = 220.0f; // 舵机测试目标角度
@@ -540,10 +544,10 @@ void Class_FSM_Shooting::Shooting_TIM_Status_PeriodElapsedCallback()
         {
             Set_Status(Shooting_Control_Type_READY_PRE);
         }
-        else
-        {
-            Set_Status(Shooting_Control_Type_WAITING);
-        }
+        // else
+        // {
+        //     Set_Status(Shooting_Control_Type_WAITING);
+        // }
     }
     break;
     case (Shooting_Control_Type_READY_PRE): // 预准备状态：停留一会儿，让舵机撒放器闭合扣住，上膛滑块就位
@@ -672,17 +676,25 @@ void Class_FSM_Shooting::Shooting_TIM_Status_PeriodElapsedCallback()
         // 发射完成后的状态处理
 
         // 先保持电机的位置不动，等待上膛完成和裁判系统允许发射的信号
-        Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
-        Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
-        Booster->Motor_Push_L.Set_Target_Radian(0.97f);
-        Booster->Motor_Push_R.Set_Target_Radian(0.97f);
+        // Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+        // Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+        // Booster->Motor_Push_L.Set_Target_Radian(0.97f);
+        // Booster->Motor_Push_R.Set_Target_Radian(0.97f);
 
         // Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
         // Booster->Motor_Pull.Set_Target_Radian(0.90f);
-
+    // Reload_Control_Type_WAITING,          //等待上膛滑块到位
+    // Reload_Control_Type_PUSHING,          // 上弹推进过程
+    // Reload_Control_Type_RETRACTING,       // 换弹机构回退过程（给发射机构让路）
+    // Reload_Control_Type_HOLD,             // 保持当前角度不动状态
         // 在此状态卡住，等待裁判系统允许下一次发射的信号，同时等待上膛完成
-        if (Referee_Allow_Shoot && (Booster->Get_Reload_Status() == Reload_Status_FINISHED))
+        if (Referee_Allow_Shoot
+        && (Booster->Get_Reload_Control_Type() == Reload_Control_Type_HOLD || Booster->Get_Reload_Control_Type() == Reload_Control_Type_WAITING) 
+        && Booster->Get_Reload_Status() == Reload_Status_FINISHED
+        && reload_count > last_reload_count_for_shooting_ready) // 仅当“本轮新完成一次换弹”时才放行
         {
+            // 消费本次换弹计数，避免同一次换弹被重复放行
+            last_reload_count_for_shooting_ready = reload_count;
             // 重置状态机，回到 READY_PRE 状态，准备下一次发射
             Set_Status(Shooting_Control_Type_READY_PRE);
         }
@@ -863,13 +875,16 @@ void Class_FSM_Reload::Reload_TIM_Status_PeriodElapsedCallback()
         // 换弹完成状态设置为：完成
         Booster->Set_Reload_Status(Reload_Status_FINISHED);
 
+        if (Status[Now_Status_Serial].Time == 1)
+        {
+            reload_count += 1; // 仅在进入 HOLD 状态的第一帧计数一次
+        }
+
         // 保持当前的位置不动
         Booster->Motor_Reload_Angle.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
         Booster->Motor_Reload_Linear.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
         Booster->Motor_Reload_Angle.Set_Target_Radian(Booster->target_position_reload_angle);
         Booster->Motor_Reload_Linear.Set_Target_Radian(Booster->init_position_reload_linear);
-
-
 
         // 换弹完成后，等待下一次发射指令，同时监测发射动作的发生（通过发射数量的变化来判断）
         if (Booster->Get_Booster_Control_Type() == Booster_Control_Type_NORMAL  
@@ -1180,12 +1195,12 @@ void Class_Booster::TIM_Calculate_PeriodElapsedCallback()
 
     // 直线电机校准
     FSM_Reload_Linear_Calibration.Linear_Calibration_TIM_Status_PeriodElapsedCallback();
-    
+
+    // 换弹状态机
+    FSM_Reload.Reload_TIM_Status_PeriodElapsedCallback();
+
     // 发射状态机
     FSM_Shooting.Shooting_TIM_Status_PeriodElapsedCallback();
-
-    // // 换弹状态机
-    FSM_Reload.Reload_TIM_Status_PeriodElapsedCallback();
 
     Output();
 
