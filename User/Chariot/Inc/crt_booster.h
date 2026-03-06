@@ -283,12 +283,12 @@ protected:
     // 在初始化的时候直接先把init的值赋给target得了 方便循环赋值 上面的init不用了----------------
 
     float target_position_reload_angle = 0.0f;  // 换弹机构角度电机目标位置
-    float target_position_reload_linear = 0.96f; // 换弹机构线性电机目标位置
+    float target_position_reload_linear = 0.92f; // 换弹机构线性电机目标位置
 
     float now_position_reload_angle = 0.0f;  // 当前angle电机位置
     float now_position_reload_linear = 0.0f; // 当前linear电机位置
 
-    /*----------------------------servo----------------------------------*/
+    /*----------------------------servo--------------------------------__*/
     float tirrger_fire_angle = 260.0f; // 舵机发射角度
     float tirrger_reset_angle = 120.0f; // 舵机复位角度
 

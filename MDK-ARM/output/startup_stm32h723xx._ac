@@ -1,0 +1,9 @@
+--target=arm-arm-none-eabi -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -masm=auto  -Wa,armasm,--diag_suppress=A1950W -c
+-gdwarf-4
+-I./RTE/_ZLLC_2026
+-ID:/Work_stm/keil540/ARM/Packs/ARM/CMSIS-DSP/1.15.0/Include
+-ID:/Work_stm/keil540/ARM/Packs/ARM/CMSIS-DSP/1.15.0/PrivateInclude
+-ID:/Work_stm/keil540/ARM/Packs/ARM/CMSIS/6.1.0/CMSIS/Core/Include
+-ID:/Work_stm/keil540/ARM/Packs/Keil/STM32H7xx_DFP/3.1.1/Drivers/CMSIS/Device/ST/STM32H7xx/Include
+-Wa,armasm,--pd,"__UVISION_VERSION SETA 540" -Wa,armasm,--pd,"STM32H723xx SETA 1" -Wa,armasm,--pd,"_RTE_ SETA 1"
+-o ./output/startup_stm32h723xx.o "startup_stm32h723xx.s"

@@ -287,12 +287,12 @@
         <Ww>
           <count>27</count>
           <WinNumber>1</WinNumber>
-          <ItemText>time_test_waiting</ItemText>
+          <ItemText>time_test_waiting,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>28</count>
           <WinNumber>1</WinNumber>
-          <ItemText>time_test_pushing</ItemText>
+          <ItemText>time_test_pushing,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>29</count>
@@ -313,6 +313,21 @@
           <count>32</count>
           <WinNumber>1</WinNumber>
           <ItemText>\\ZLLC_2026\../User/Task/Src/tsk_config_and_callback.cpp\chariot.Booster.Reload_Status</ItemText>
+        </Ww>
+        <Ww>
+          <count>33</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>reload_servo_flag_lift</ItemText>
+        </Ww>
+        <Ww>
+          <count>34</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>reload_servo_lift_time</ItemText>
+        </Ww>
+        <Ww>
+          <count>35</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>reload_count</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
