@@ -120,7 +120,6 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name>P</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -491,6 +490,11 @@
           <count>28</count>
           <WinNumber>2</WinNumber>
           <ItemText>\\ZLLC_2026\../User/Chariot/Src/crt_booster.cpp\errorcoder</ItemText>
+        </Ww>
+        <Ww>
+          <count>29</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>push_ready_or_switch</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow2>

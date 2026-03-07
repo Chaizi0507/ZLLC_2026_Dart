@@ -30,6 +30,8 @@ static volatile bool pb3_press_event_latched = false;
 volatile uint32_t pb3_exti_irq_count = 0;
 volatile uint32_t pb3_event_consumed_count = 0;
 
+bool push_ready_or_switch = 0;
+
 //换弹次数
 int reload_count = 0;
 // Shooting 状态机上次已消费的换弹次数（用于确保每完成一次换弹才放行一次）
@@ -39,7 +41,7 @@ float test_Motor_Reload_Linear_Target = 0.5f; // 换弹直线电机测试目标�
 float test_reload_servo_angle = 220.0f; // 舵机测试目标角度
 
 //push电机target能够容忍的误差
-float push_target_tolerance = 0.014f;
+float push_target_tolerance = 0.009f;
 
 // 校准是否完成相关标志位
 bool Push_Calibration_Finished = false;
@@ -278,6 +280,7 @@ void Class_FSM_Push_Calibration::Push_Calibration_TIM_Status_PeriodElapsedCallba
             forward_flag_L = 0;
             forward_flag_R = 0;
         }
+
         if (Status[Now_Status_Serial].Time > 100)
         {
             Angle_Forward_R = Booster->Motor_Push_R.Get_Now_Angle();
@@ -620,20 +623,34 @@ void Class_FSM_Shooting::Shooting_TIM_Status_PeriodElapsedCallback()
         }
         // 继续跑这个，以免时间不够，没到位置（因为之前的NORMAL也在跑）这个不确定，再说
 
-        if (fabs(Booster->Get_Now_position_push() - Booster->Get_Target_position_push()) < push_target_tolerance)
+        push_ready_or_switch =
+            (fabs(Booster->Get_Now_position_push() - Booster->Get_Target_position_push()) < push_target_tolerance) ||
+            (PB3_GPIO == 1);
+
+        // 条件是到达位置或者触碰到微动开关
+        if (push_ready_or_switch)
         {
             // 撒放器闭合已经在跑校准过程中完成，但是由于循环跑状态机，所以要再设置一次
+            // 保持角度环并锁定当前位姿，防止过冲且不丢闭环
+            //float hold_push_pos = Booster->Get_Now_position_push();
+            // Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+            // Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+            // Booster->Motor_Push_L.Set_Target_Radian(hold_push_pos);
+            // Booster->Motor_Push_R.Set_Target_Radian(hold_push_pos);
+
             Booster->Servo_Trigger.Set_Target_Angle(Booster->tirrger_reset_angle); // 舵机扣住
             ready_pre_push_reached_time = Status[Now_Status_Serial].Time;// 记录上膛滑块到位的时间戳
         }
 
-        if (fabs(Booster->Get_Now_position_push() - Booster->Get_Target_position_push()) < push_target_tolerance && ready_pre_push_reached_time > 6000) // 等待500ms 让撒放器扣住
+        if (push_ready_or_switch && ready_pre_push_reached_time > 6000) // 等待500ms 让撒放器扣住
         {
             // 撒放器闭合已经在跑校准过程中完成，但是由于循环跑状态机，所以要再设置一次
             Booster->Servo_Trigger.Set_Target_Angle(Booster->tirrger_reset_angle); // 舵机扣住
 
             if (!is_reloading)
             {
+                Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+                Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
                 Booster->Motor_Push_L.Set_Target_Radian(0.95f);
                 Booster->Motor_Push_R.Set_Target_Radian(0.95f);
             }
