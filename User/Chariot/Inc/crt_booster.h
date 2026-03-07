@@ -288,12 +288,12 @@ protected:
     float now_position_reload_angle = 0.0f;  // 当前angle电机位置
     float now_position_reload_linear = 0.0f; // 当前linear电机位置
 
-    /*----------------------------servo--------------------------------__*/
+    /*----------------------------servo----------------------------------*/
     float tirrger_fire_angle = 260.0f; // 舵机发射角度
     float tirrger_reset_angle = 120.0f; // 舵机复位角度
 
     float reload_lift_angle = 220.0f; // 舵机换弹抬起角度
-    float reload_drop_angle = 26.0f;  // 舵机换弹放下角度
+    float reload_drop_angle = 22.0f;  // 舵机换弹放下角度
 
     /*----------------------------tension----------------------------------*/
     // 拉力相关变量
