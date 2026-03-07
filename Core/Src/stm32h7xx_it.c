@@ -83,6 +83,7 @@ extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart10;
 /* USER CODE BEGIN EV */
 void UART_IDLEHandler(void);
+extern void Booster_On_PB3_Exti(void);
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -222,6 +223,20 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32h7xx.s).                    */
 /******************************************************************************/
+
+/**
+  * @brief This function handles EXTI line3 interrupt.
+  */
+void EXTI3_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI3_IRQn 0 */
+
+  /* USER CODE END EXTI3_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
+  /* USER CODE BEGIN EXTI3_IRQn 1 */
+
+  /* USER CODE END EXTI3_IRQn 1 */
+}
 
 /**
   * @brief This function handles DMA1 stream0 global interrupt.
@@ -603,6 +618,14 @@ void FDCAN3_IT0_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if (GPIO_Pin == GPIO_PIN_3)
+  {
+    Booster_On_PB3_Exti();
+  }
+}
 
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)

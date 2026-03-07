@@ -526,7 +526,7 @@ void Task1ms_TIM5_Callback()
         
     /****************************** 驱动层回调函数 1ms *****************************************/ 
         //CAN统一打包发送
-        TIM_CAN_PeriodElapsedCallback();
+        // TIM_CAN_PeriodElapsedCallback();
         //RS485统一发送(dart)
         TIM_RS485_PeriodElapsedCallback();
         

@@ -21,7 +21,14 @@ volatile int e,f,g,h;
 int time_test_waiting = 0;
 int time_test_pushing = 0;
 
+int test123 = 0;
+int PB3_GPIO = 0;
+int PE15_GPIO = 0;
 
+// PB3 中断锁存：按下一次即记住，直到状态机消费
+static volatile bool pb3_press_event_latched = false;
+volatile uint32_t pb3_exti_irq_count = 0;
+volatile uint32_t pb3_event_consumed_count = 0;
 
 //换弹次数
 int reload_count = 0;
@@ -76,6 +83,25 @@ void Update_Referee_Allow_Edge()
         referee_allow_rise_cnt++;
     }
     referee_allow_prev = Referee_Allow_Shoot;
+}
+
+extern "C" void Booster_On_PB3_Exti(void)
+{
+    pb3_exti_irq_count++;
+    pb3_press_event_latched = true;
+}
+
+bool Consume_PB3_Press_Event()
+{
+    __disable_irq();
+    bool has_event = pb3_press_event_latched;
+    pb3_press_event_latched = false;
+    __enable_irq();
+    if (has_event)
+    {
+        pb3_event_consumed_count++;
+    }
+    return has_event;
 }
 /*-----------------------------------------------*/
 
@@ -280,8 +306,14 @@ void Class_FSM_Push_Calibration::Push_Calibration_TIM_Status_PeriodElapsedCallba
         Booster->Motor_Push_L.Set_Target_Omega_Radian(-speed);
         Booster->Motor_Push_R.Set_Target_Omega_Radian(-speed);
 
-        if (fabs(Booster->Motor_Push_L.Get_Now_Torque()) > Torque_Threshold_down &&
-            fabs(Booster->Motor_Push_R.Get_Now_Torque()) > Torque_Threshold_down)
+        // 进入该状态第一帧清除旧事件，避免跨状态误触发
+        if (Status[Now_Status_Serial].Time == 1)
+        {
+            (void)Consume_PB3_Press_Event();
+        }
+
+        // 向后端触发采用 PB3 上升沿事件（锁存后消费）
+        if (Consume_PB3_Press_Event())
         {
             Set_Status(3);
         }
@@ -297,12 +329,6 @@ void Class_FSM_Push_Calibration::Push_Calibration_TIM_Status_PeriodElapsedCallba
             Booster->Motor_Push_L.Set_Out(0.f);
             backward_flag_L = 1;
         }
-        else if (fabs(Booster->Motor_Push_L.Get_Now_Torque()) < Torque_Threshold_down)
-        {
-            Set_Status(2);
-            backward_flag_L = 0;
-            backward_flag_R = 0;
-        }
 
         if (Status[Now_Status_Serial].Time > 100)
         {
@@ -311,12 +337,6 @@ void Class_FSM_Push_Calibration::Push_Calibration_TIM_Status_PeriodElapsedCallba
             Booster->Motor_Push_R.Set_Target_Torque(0.f);
             Booster->Motor_Push_R.Set_Out(0.f);
             backward_flag_R = 1;
-        }
-        else if (fabs(Booster->Motor_Push_R.Get_Now_Torque()) < Torque_Threshold_down)
-        {
-            Set_Status(2);
-            backward_flag_L = 0;
-            backward_flag_R = 0;
         }
         if (backward_flag_L == 1 && backward_flag_R == 1)
         {
@@ -1294,6 +1314,17 @@ void Class_Booster::TIM_Calculate_PeriodElapsedCallback()
 {
     //
     Update_Referee_Allow_Edge();
+
+    PB3_GPIO = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3) == GPIO_PIN_SET ? 1 : 0;
+
+    //调试代码
+    
+    if(PB3_GPIO == 1)
+    {
+        test123++;
+    }
+
+    PE15_GPIO = HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_15) == GPIO_PIN_SET ? 1 : 0;
 
     // 拉力机数值更新
     Measured_Tension = TensionMeter.Get_Tension();
