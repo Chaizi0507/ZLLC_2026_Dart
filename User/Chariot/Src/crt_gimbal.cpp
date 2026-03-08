@@ -260,7 +260,7 @@ float Class_Gimbal::Calculate_Linear(float max,float min,float now_enc, float up
 void Class_Gimbal::Init()
 {
     // imu初始化
-    Boardc_BMI.Init();
+    //Boardc_BMI.Init();
 
     FSM_Yaw_Calibration.Gimbal = this;
     FSM_Pitch_Calibration.Gimbal = this;

@@ -54,6 +54,7 @@ enum Enum_Shooting_Control_Type
     Shooting_Control_Type_WAITING= 0,
     Shooting_Control_Type_INIT,
     Shooting_Control_Type_READY_PRE,
+    Shooting_Control_Type_READY_PRE2,
     Shooting_Control_Type_READY,
     Shooting_Control_Type_SHOOTING,
     Shooting_Control_Type_SHOOTING_FINISHED,
@@ -148,7 +149,7 @@ class Class_FSM_Pull_Calibration : public Class_FSM
 public:
     Class_Booster *Booster;
 
-    float Torque_Threshold = 1500.0f;
+    float Torque_Threshold = 2500.0f;//之前是1500 2000 
     float speed = 40.0f;
 
     float Angle_Forward = 0.0f;
@@ -268,7 +269,7 @@ protected:
     // bool Push_Calibration_Finished = false;
     // bool Pull_Calibration_Finished = false;
 
-    float target_position_push = 0.f; // 校准完成后push电机目标位置
+    float target_position_push = 0.9f; // 校准完成后push电机目标位置
     float target_position_pull = 0.5f;  // 校准完成后pull电机目标位置
 
     float now_position_push = 0.0f; // 当前push电机位置
@@ -298,7 +299,7 @@ protected:
     /*----------------------------tension----------------------------------*/
     // 拉力相关变量
     float Measured_Tension = 0;     // 测量的拉力值
-    float Target_Tension = 37000.0f; // 目标的拉力值，单位g
+    float Target_Tension = 35800.0f; // 目标的拉力值，单位g
 
     // 拉力环相关变量
     float now_tension_value = 0.0f;                            // 当前测得的拉力值

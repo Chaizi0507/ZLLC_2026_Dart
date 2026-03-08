@@ -631,7 +631,7 @@ extern "C" void Task_Init()
 
     /********************************* 使能调度时钟 *********************************/
 
-    HAL_TIM_Base_Start_IT(&htim4);
+    //HAL_TIM_Base_Start_IT(&htim4);
     HAL_TIM_Base_Start_IT(&htim5);
 }
 
