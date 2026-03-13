@@ -273,11 +273,11 @@ void Class_DJI_Motor_GM6020::Data_Process()
     //处理异常
      if(tmp_encoder > Encoder_Num_Per_Round)
      {
-        tmp_encoder = 0;
+         return;
      }
 
     // 计算圈数与总编码器值
-    if (Start_Falg == 1 && Data.Pre_Encoder != 0)
+    if (Start_Falg == 1)
     {
         delta_encoder = tmp_encoder - Data.Pre_Encoder;
         if (delta_encoder < -Encoder_Num_Per_Round / 2)

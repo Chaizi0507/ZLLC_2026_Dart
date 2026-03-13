@@ -1199,8 +1199,9 @@ float Motor_Reload_C610_Anlge_I_test = 0.0f;
 float Motor_Reload_6020_Omega_P_test = 600.0f;
 float Motor_Reload_6020_Omega_I_test = 3.5f;
 float Motor_Reload_6020_Omega_D_test = 0.0f;
-float Motor_Reload_6020_Anlge_P_test = 15.0f;
+float Motor_Reload_6020_Anlge_P_test = 50.0f;
 float Motor_Reload_6020_Anlge_I_test = 0.0f;
+float Motor_Reload_6020_Anlge_D_test = 1.08f;
 
 
 /**
@@ -1252,7 +1253,7 @@ void Class_Booster::Init()
 
     // 换弹电机角度
     Motor_Reload_Angle.Init(&hfdcan1, DJI_Motor_ID_0x205, DJI_Motor_Control_Method_ANGLE);
-    Motor_Reload_Angle.PID_Angle.Init(Motor_Reload_6020_Anlge_P_test, Motor_Reload_6020_Anlge_I_test, 0.0f, 0.0f, 5.0f * PI, 150.0f * PI);
+    Motor_Reload_Angle.PID_Angle.Init(Motor_Reload_6020_Anlge_P_test, Motor_Reload_6020_Anlge_I_test, Motor_Reload_6020_Anlge_D_test, 0.0f, 5.0f * PI, 150.0f * PI);
     Motor_Reload_Angle.PID_Omega.Init(Motor_Reload_6020_Omega_P_test, Motor_Reload_6020_Omega_I_test, Motor_Reload_6020_Omega_D_test, 0.0f, Motor_Reload_Angle.Get_Output_Max() * 0.4f, Motor_Reload_Angle.Get_Output_Max(),0.0f,0.0f,0.2f);
 
     Set_Reload_Status(Reload_Status_FINISHED); // 初始化为换弹完成状态
