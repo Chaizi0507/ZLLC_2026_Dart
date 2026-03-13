@@ -120,7 +120,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name>?</Name>
+          <Name>V</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -360,6 +360,16 @@
           <WinNumber>1</WinNumber>
           <ItemText>time_reloading</ItemText>
         </Ww>
+        <Ww>
+          <count>42</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>enable_booster_flag</ItemText>
+        </Ww>
+        <Ww>
+          <count>43</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\ZLLC_2026\../User/Chariot/Src/crt_booster.cpp\Referee_Allow_Shoot</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -527,6 +537,11 @@
           <WinNumber>2</WinNumber>
           <ItemText>dart_fired_count</ItemText>
         </Ww>
+        <Ww>
+          <count>33</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>CAN1_0x200_Tx_Data</ItemText>
+        </Ww>
       </WatchWindow2>
       <MemoryWindow2>
         <Mm>
@@ -650,7 +665,7 @@
 
   <Group>
     <GroupName>Chariot</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -658,7 +673,7 @@
       <GroupNumber>4</GroupNumber>
       <FileNumber>4</FileNumber>
       <FileType>8</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\User\Chariot\Src\crt_booster.cpp</PathWithFileName>

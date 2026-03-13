@@ -543,7 +543,7 @@ void Class_Chariot::TIM1msMod50_Alive_PeriodElapsedCallback()
     if (mod50 == 50)
     {
         mod50_mod3++;
-// TIM_Unline_Protect_PeriodElapsedCallback();
+    // TIM_Unline_Protect_PeriodElapsedCallback();
 #ifdef CHASSIS
         Referee.TIM1msMod50_Alive_PeriodElapsedCallback();
         Chassis.Supercap.TIM_Alive_PeriodElapsedCallback();
@@ -621,7 +621,7 @@ void Class_Chariot::TIM1msMod50_Alive_PeriodElapsedCallback()
         Gimbal.Motor_Pitch_L.TIM_Alive_PeriodElapsedCallback();
         Gimbal.Motor_Pitch_R.TIM_Alive_PeriodElapsedCallback();
         Gimbal.Motor_Yaw.TIM_Alive_PeriodElapsedCallback();
-        Gimbal.Boardc_BMI.TIM1msMod50_Alive_PeriodElapsedCallback();
+        //Gimbal.Boardc_BMI.TIM1msMod50_Alive_PeriodElapsedCallback();
 
         Booster.Motor_Pull.TIM_Alive_PeriodElapsedCallback();
         Booster.Motor_Push_L.TIM_Alive_PeriodElapsedCallback();

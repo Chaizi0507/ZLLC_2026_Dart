@@ -52,7 +52,7 @@ public:
     float Angle_Left = 0.0f;
     float Angle_Right = 0.0f;
 
-    void Reload_TIM_Status_PeriodElapsedCallback();
+    void Yaw_Calibration_TIM_Status_PeriodElapsedCallback();
 };
 
 /**
@@ -77,7 +77,7 @@ public:
     int Up_Flag_R = 0;
     int Down_Flag_R = 0;
 
-    void Reload_TIM_Status_PeriodElapsedCallback();
+    void Pitch_Calibration_TIM_Status_PeriodElapsedCallback();
 };
 
 /**

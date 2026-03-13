@@ -149,7 +149,7 @@ class Class_FSM_Pull_Calibration : public Class_FSM
 public:
     Class_Booster *Booster;
 
-    float Torque_Threshold = 2500.0f;//之前是1500 2000 
+    float Torque_Threshold = 1500.0f;//之前是1500 2000 
     float speed = 40.0f;
 
     float Angle_Forward = 0.0f;
@@ -284,7 +284,7 @@ protected:
     // 在初始化的时候直接先把init的值赋给target得了 方便循环赋值 上面的init不用了----------------
 
     float target_position_reload_angle = 0.0f;  // 换弹机构角度电机目标位置
-    float target_position_reload_linear = 0.92f; // 换弹机构线性电机目标位置
+    float target_position_reload_linear = 0.85f; // 换弹机构线性电机目标位置
 
     float now_position_reload_angle = 0.0f;  // 当前angle电机位置
     float now_position_reload_linear = 0.0f; // 当前linear电机位置
@@ -299,7 +299,7 @@ protected:
     /*----------------------------tension----------------------------------*/
     // 拉力相关变量
     float Measured_Tension = 0;     // 测量的拉力值
-    float Target_Tension = 35800.0f; // 目标的拉力值，单位g
+    float Target_Tension = 32000.0f; // 目标的拉力值，单位g
 
     // 拉力环相关变量
     float now_tension_value = 0.0f;                            // 当前测得的拉力值

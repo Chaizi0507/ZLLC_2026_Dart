@@ -22,7 +22,7 @@
 /* Private function declarations ---------------------------------------------*/
 
 /* Function prototypes -------------------------------------------------------*/
-void Class_FSM_Yaw_Calibration::Reload_TIM_Status_PeriodElapsedCallback()
+void Class_FSM_Yaw_Calibration::Yaw_Calibration_TIM_Status_PeriodElapsedCallback()
 {
     
     Status[Now_Status_Serial].Time++;
@@ -93,7 +93,7 @@ void Class_FSM_Yaw_Calibration::Reload_TIM_Status_PeriodElapsedCallback()
     }
 }
 
-void Class_FSM_Pitch_Calibration::Reload_TIM_Status_PeriodElapsedCallback()
+void Class_FSM_Pitch_Calibration::Pitch_Calibration_TIM_Status_PeriodElapsedCallback()
 {
     
     Status[Now_Status_Serial].Time++;

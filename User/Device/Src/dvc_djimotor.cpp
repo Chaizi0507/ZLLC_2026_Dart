@@ -250,90 +250,93 @@ void Class_DJI_Motor_GM6020::Init(FDCAN_HandleTypeDef *hcan, Enum_DJI_Motor_ID _
     init_filter(&filter, WINDOW_SIZE);
 
     kalman_init(&Kf_Omega, 0.0f);
-
-    // 关键：上电状态复位
-    Start_Falg = 0;
-    Rx_Stable_Count = 0;
-    Angle_Target_Synced = 0;
-    Data.Total_Encoder = 0;
-    Data.Total_Round = 0;
-    Data.Pre_Encoder = 0;
-    Target_Radian = 0.0f;
-    Target_Omega_Radian = 0.0f;
-    Out = 0.0f;
 }
-
-static inline int32_t abs_i32(int32_t x) { return (x >= 0) ? x : -x; }
-
 /**
  * @brief 数据处理过程
  *
  */
+
 void Class_DJI_Motor_GM6020::Data_Process()
 {
+    // 数据处理过程
     int16_t delta_encoder;
     uint16_t tmp_encoder;
     int16_t tmp_omega, tmp_torque, tmp_temperature;
     Struct_DJI_Motor_CAN_Data *tmp_buffer = (Struct_DJI_Motor_CAN_Data *)CAN_Manage_Object->Rx_Buffer.Data;
 
+    // 处理大小端
     Math_Endian_Reverse_16((void *)&tmp_buffer->Encoder_Reverse, (void *)&tmp_encoder);
     Math_Endian_Reverse_16((void *)&tmp_buffer->Omega_Reverse, (void *)&tmp_omega);
     Math_Endian_Reverse_16((void *)&tmp_buffer->Torque_Reverse, (void *)&tmp_torque);
     Math_Endian_Reverse_16((void *)&tmp_buffer->Temperature, (void *)&tmp_temperature);
 
-    if (Start_Falg == 0)
-    {
-        // 首帧：只建系
-        Data.Pre_Encoder = tmp_encoder;
-        Data.Total_Encoder = (int32_t)tmp_encoder + (int32_t)Encoder_Offset;
-        Data.Total_Round = Data.Total_Encoder / (int32_t)Encoder_Num_Per_Round;
-        Start_Falg = 1;
-        Rx_Stable_Count = 0;
-    }
-    else
-    {
-        int32_t diff = (int32_t)tmp_encoder - (int32_t)Data.Pre_Encoder;
+    //处理异常
+     if(tmp_encoder > Encoder_Num_Per_Round)
+     {
+        tmp_encoder = 0;
+     }
 
-        const int32_t half = (int32_t)Encoder_Num_Per_Round / 2; // 4096
-        const int32_t full = (int32_t)Encoder_Num_Per_Round;     // 8192
-        if (diff > half)  diff -= full;
-        if (diff < -half) diff += full;
-
-        // 放宽毛刺阈值：仅过滤明显异常
-        const int32_t glitch_th = 3800;
-        if (abs_i32(diff) < glitch_th)
+    // 计算圈数与总编码器值
+    if (Start_Falg == 1 && Data.Pre_Encoder != 0)
+    {
+        delta_encoder = tmp_encoder - Data.Pre_Encoder;
+        if (delta_encoder < -Encoder_Num_Per_Round / 2)
         {
-            Data.Total_Encoder += diff;
-
-            // 稳定帧计数：用于“允许角度环接管”
-            if (abs_i32(diff) < 1200)
-            {
-                if (Rx_Stable_Count < 20) Rx_Stable_Count++;
-            }
-            else
-            {
-                if (Rx_Stable_Count > 0) Rx_Stable_Count--;
-            }
+            // 正方向转过了一圈
+            Data.Total_Round++;
         }
-
-        Data.Pre_Encoder = tmp_encoder;
-        Data.Total_Round = Data.Total_Encoder / (int32_t)Encoder_Num_Per_Round;
+        else if (delta_encoder > Encoder_Num_Per_Round / 2)
+        {
+            // 反方向转过了一圈
+            Data.Total_Round--;
+        }
     }
+    Data.Total_Encoder = Data.Total_Round * Encoder_Num_Per_Round + tmp_encoder + Encoder_Offset;
 
+    // 保存单圈坐标（0~8191 / 0~2PI）
     Now_Encoder_Single = tmp_encoder;
     Now_Radian_Single = (float)tmp_encoder / (float)Encoder_Num_Per_Round * 2.0f * PI;
 
+    // 计算电机本身信息
+    // 多圈坐标：用于连续角度控制（例如换弹每次 +60°）
     Data.Now_Angle = (float)Data.Total_Encoder / (float)Encoder_Num_Per_Round * 360.0f;
     Data.Now_Radian = (float)Data.Total_Encoder / (float)Encoder_Num_Per_Round * 2.0f * PI;
+    // Data.Now_Omega_Angle = (float)(Data.Total_Encoder - Data.Pre_Total_Encoder)/8191.0f*60.0f*1000.0f;  //rpm
 
     kalman_update(&Kf_Omega, (float)tmp_omega);
     Data.Now_Omega_Radian = (float)Kf_Omega.x * RPM_TO_RADPS;
     Data.Now_Omega_Angle = (float)Kf_Omega.x * RPM_TO_DEG;
     Data.Now_Torque = tmp_torque;
     Data.Now_Temperature = tmp_temperature + CELSIUS_TO_KELVIN;
+    float temp_yaw;
+    if (Get_Now_Radian() > Get_Zero_Position())
+    {
+        temp_yaw = -(Get_Now_Radian() - Get_Zero_Position()); // 电机数据转标定电机坐标系
+        if (temp_yaw <= -PI)
+        {
+            temp_yaw += 2 * PI;
+        }
+    }
+    else if (Get_Now_Radian() <= Get_Zero_Position())
+    {
+        temp_yaw = Get_Zero_Position() - Get_Now_Radian();
+        if (temp_yaw >= PI)
+        {
+            temp_yaw -= 2 * PI;
+        }
+    }
+    else
+        temp_yaw = 0.0f;
+    t_yaw = temp_yaw;
 
+    // 存储预备信息
+    Data.Pre_Encoder = tmp_encoder;
     Data.Pre_Total_Encoder = Data.Total_Encoder;
     Data.Pre_Angle = Data.Now_Angle;
+    if (Start_Falg == 0)
+    {
+        Start_Falg = 1;
+    }
 }
 
 void Class_DJI_Motor_GM6020::Set_Target_SingleTurn_Encoder_Nearest(uint16_t __Target_Single_Encoder)
@@ -452,37 +455,18 @@ void Class_DJI_Motor_GM6020::TIM_PID_PeriodElapsedCallback()
     break;
     case (DJI_Motor_Control_Method_ANGLE):
     {
-        // 关键：首段稳定前不闭环拉扯，先做一次 target=now 对齐
-        if (Angle_Target_Synced == 0)
-        {
-            Target_Radian = Data.Now_Radian;
-            Target_Angle = Data.Now_Angle;
-
-            PID_Angle.Set_Integral_Error(0.0f);
-            PID_Omega.Set_Integral_Error(0.0f);
-
-            if (Rx_Stable_Count >= 5)
-            {
-                Angle_Target_Synced = 1;
-            }
-
-            Target_Omega_Radian = 0.0f;
-            Out = 0.0f;
-            break;
-        }
-
         PID_Angle.Set_Target(Target_Radian);
-        PID_Angle.Set_Now(Data.Now_Radian);
+        PID_Angle.Set_Now(Data.Now_Radian); //这里用弧度制 // 转换后的角度，右手螺旋定律，标准坐标系
         PID_Angle.TIM_Adjust_PeriodElapsedCallback();
 
         Target_Omega_Radian = PID_Angle.Get_Out();
 
         PID_Omega.Set_Target(Target_Omega_Radian);
+        // PID_Omega.Set_Now(Transform_Omega);
         PID_Omega.Set_Now(Data.Now_Omega_Radian);
         PID_Omega.TIM_Adjust_PeriodElapsedCallback();
 
         Out = PID_Omega.Get_Out();
-        
     }
     break;
     case (DJI_Motor_Control_Method_AGV_MODE):
