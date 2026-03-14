@@ -95,7 +95,6 @@ static uint32_t referee_allow_rise_cnt = 0;
 //使能发射机构的enable_booster_flag
 uint8_t enable_booster_flag = 0;
 
-
 void Update_Referee_Allow_Edge()
 {
     if (Referee_Allow_Shoot && !referee_allow_prev) {
@@ -293,14 +292,8 @@ void Class_FSM_Push_Calibration::Push_Calibration_TIM_Status_PeriodElapsedCallba
         Booster->Motor_Push_L.Set_Target_Omega_Radian(speed);
         Booster->Motor_Push_R.Set_Target_Omega_Radian(speed);
 
-        // 进入该状态第一帧清除旧事件，避免跨状态误触发
-        if (Status[Now_Status_Serial].Time == 1)
-        {
-            (void)Consume_PD7_Press_Event();
-        }
-
-        // 向前端触发采用 PD7 上升沿事件（锁存后消费）
-        if (Consume_PD7_Press_Event())
+        if (fabs(Booster->Motor_Push_L.Get_Now_Torque()) > 1500 &&
+            fabs(Booster->Motor_Push_R.Get_Now_Torque()) > 1500)
         {
             Set_Status(1);
         }
@@ -308,21 +301,34 @@ void Class_FSM_Push_Calibration::Push_Calibration_TIM_Status_PeriodElapsedCallba
     break;
     case (1): // 前侧检测
     {
-        if (Status[Now_Status_Serial].Time == 1)
+        if (Status[Now_Status_Serial].Time > 100)
         {
             Angle_Forward_L = Booster->Motor_Push_L.Get_Now_Angle();
             Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_TORQUE);
             Booster->Motor_Push_L.Set_Target_Torque(0.f);
             Booster->Motor_Push_L.Set_Out(0.f);
             forward_flag_L = 1;
-
+        }
+        else if (fabs(Booster->Motor_Push_L.Get_Now_Torque()) < 1500)
+        {
+            Set_Status(0);
+            forward_flag_L = 0;
+            forward_flag_R = 0;
+        }
+        if (Status[Now_Status_Serial].Time > 100)
+        {
             Angle_Forward_R = Booster->Motor_Push_R.Get_Now_Angle();
             Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_TORQUE);
             Booster->Motor_Push_R.Set_Target_Torque(0.f);
             Booster->Motor_Push_R.Set_Out(0.f);
             forward_flag_R = 1;
         }
-
+        else if (fabs(Booster->Motor_Push_R.Get_Now_Torque()) < 1500)
+        {
+            Set_Status(0);
+            forward_flag_L = 0;
+            forward_flag_R = 0;
+        }
         if (forward_flag_L == 1 && forward_flag_R == 1)
         {
             Set_Status(2);
@@ -679,7 +685,7 @@ void Class_FSM_Shooting::Shooting_TIM_Status_PeriodElapsedCallback()
 
         //跑到最低点
         push_ready_or_switch = Consume_PB3_Press_Event() 
-        || fabs(Booster->Get_Now_position_push() - 0.f) < 0.003;//单独设置的阈值
+        || fabs(Booster->Get_Now_position_push() - 0.f) < 0.001;//单独设置的阈值
 
         // 条件是触碰到微动开关
         if (push_ready_or_switch && ready_pre_push_reached_time < 0)
@@ -1303,8 +1309,9 @@ void Class_Booster::Output()
     // Motor_Push_L.PID_Angle.Set_K_I(Motor_Push_Angle_I_test);
     // Motor_Reload_Linear.PID_Angle.Set_K_P(Motor_Reload_C610_Anlge_P_test);
     // Motor_Reload_Linear.PID_Angle.Set_K_I(Motor_Reload_C610_Anlge_I_test);
-    // Motor_Reload_Angle.PID_Angle.Set_K_P(Motor_Reload_6020_Anlge_P_test);
-    // Motor_Reload_Angle.PID_Angle.Set_K_I(Motor_Reload_6020_Anlge_I_test);
+    Motor_Reload_Angle.PID_Angle.Set_K_P(Motor_Reload_6020_Anlge_P_test);
+    Motor_Reload_Angle.PID_Angle.Set_K_I(Motor_Reload_6020_Anlge_I_test);
+    Motor_Reload_Angle.PID_Angle.Set_K_D(Motor_Reload_6020_Anlge_D_test);
 
     // //角度环测试
     // Motor_Pull.Set_Target_Radian(Target_test_b_pull);
@@ -1428,7 +1435,7 @@ void Class_Booster::TIM_Calculate_PeriodElapsedCallback()
 
     Output();
 
-    // // PID输出
+    // PID输出
     Motor_Pull.TIM_PID_PeriodElapsedCallback();
     Motor_Push_L.TIM_PID_PeriodElapsedCallback();
     Motor_Push_R.TIM_PID_PeriodElapsedCallback();

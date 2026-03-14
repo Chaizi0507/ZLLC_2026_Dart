@@ -120,6 +120,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
+          <Name>T</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -366,6 +367,11 @@
         </Ww>
         <Ww>
           <count>43</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\ZLLC_2026\../User/Chariot/Src/crt_booster.cpp\Referee_Allow_Shoot</ItemText>
+        </Ww>
+        <Ww>
+          <count>44</count>
           <WinNumber>1</WinNumber>
           <ItemText>\\ZLLC_2026\../User/Chariot/Src/crt_booster.cpp\Referee_Allow_Shoot</ItemText>
         </Ww>
