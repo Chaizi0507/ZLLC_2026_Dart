@@ -97,6 +97,8 @@ public:
 
     void Shooting_TIM_Status_PeriodElapsedCallback();
     Enum_Shooting_Control_Type Shooting_Control_Type = Shooting_Control_Type_INIT;
+
+    float push_speed =  60.0f;
 };
 
 /*

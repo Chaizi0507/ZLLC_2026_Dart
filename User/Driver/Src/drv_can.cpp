@@ -365,7 +365,7 @@ void TIM_CAN_PeriodElapsedCallback()
         mod5 = 0;
         // // CAN1->Booster
         CAN_Send_Data(&hfdcan1, 0x200, CAN1_0x200_Tx_Data, 8); // 云台电机 按照0x200 ID 发送 可控制多个电机
-        CAN_Send_Data(&hfdcan1, 0x1fe, CAN1_0x1fe_Tx_Data, 8); // 拨弹盘电机 按照0x1fe ID 发送 可控制多个电机
+        CAN_Send_Data(&hfdcan1, 0x1ff, CAN1_0x1ff_Tx_Data, 8); // 拨弹盘电机 按照0x1ff ID 发送 可控制多个电机
 
         // //CAN2
         // CAN_Send_Data(&hfdcan2, 0x200, CAN2_0x200_Tx_Data, 8); //云台电机 按照0x200 ID 发送 可控制多个电机

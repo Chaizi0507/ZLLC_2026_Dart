@@ -120,7 +120,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name>T</Name>
+          <Name>^</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -375,6 +375,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>\\ZLLC_2026\../User/Chariot/Src/crt_booster.cpp\Referee_Allow_Shoot</ItemText>
         </Ww>
+        <Ww>
+          <count>45</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Motor_Reload_6020_Omega_P_test</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -546,6 +551,16 @@
           <count>33</count>
           <WinNumber>2</WinNumber>
           <ItemText>CAN1_0x200_Tx_Data</ItemText>
+        </Ww>
+        <Ww>
+          <count>34</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>backward_flag_L</ItemText>
+        </Ww>
+        <Ww>
+          <count>35</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>CAN1_0x1ff_Tx_Data</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow2>
