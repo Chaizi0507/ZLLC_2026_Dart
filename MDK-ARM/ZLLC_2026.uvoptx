@@ -120,7 +120,6 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name>^</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -380,6 +379,21 @@
           <WinNumber>1</WinNumber>
           <ItemText>Motor_Reload_6020_Omega_P_test</ItemText>
         </Ww>
+        <Ww>
+          <count>46</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\ZLLC_2026\../User/Chariot/Src/crt_booster.cpp\Referee_Allow_Shoot</ItemText>
+        </Ww>
+        <Ww>
+          <count>47</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>aaaaaaa</ItemText>
+        </Ww>
+        <Ww>
+          <count>48</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>pushing_stage</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -561,6 +575,21 @@
           <count>35</count>
           <WinNumber>2</WinNumber>
           <ItemText>CAN1_0x1ff_Tx_Data</ItemText>
+        </Ww>
+        <Ww>
+          <count>36</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>chariot</ItemText>
+        </Ww>
+        <Ww>
+          <count>37</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>Class_FSM_Reload</ItemText>
+        </Ww>
+        <Ww>
+          <count>38</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>Booster</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow2>

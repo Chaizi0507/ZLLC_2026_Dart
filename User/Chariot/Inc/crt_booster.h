@@ -56,6 +56,7 @@ enum Enum_Shooting_Control_Type
     Shooting_Control_Type_READY_PRE,
     Shooting_Control_Type_READY_PRE2,
     Shooting_Control_Type_READY,
+    Shooting_Control_Type_PULLRING,
     Shooting_Control_Type_SHOOTING,
     Shooting_Control_Type_SHOOTING_FINISHED,
 };
@@ -280,7 +281,7 @@ protected:
     /*----------------------------reload----------------------------------*/
 
     // 对于6020而言 由于是弧度制 所以要写成 多少多少度 // 180*pi
-    float init_position_reload_angle = 77.0f * PI / 180.0f;  // 校准完成后Angle电机初始位置
+    float init_position_reload_angle = 79.0f * PI / 180.0f;  // 校准完成后Angle电机初始位置
     float init_position_reload_linear = 0.92f; // 校准完成后Linear电机初始位置
 
     // 在初始化的时候直接先把init的值赋给target得了 方便循环赋值 上面的init不用了----------------
@@ -296,12 +297,12 @@ protected:
     float tirrger_reset_angle = 120.0f; // 舵机复位角度
 
     float reload_lift_angle = 220.0f; // 舵机换弹抬起角度
-    float reload_drop_angle = 22.0f;  // 舵机换弹放下角度
+    float reload_drop_angle = 18.0f;  // 舵机换弹放下角度
 
     /*----------------------------tension----------------------------------*/
     // 拉力相关变量
     float Measured_Tension = 0;     // 测量的拉力值
-    float Target_Tension = 34500.0f; // 目标的拉力值，单位g
+    float Target_Tension = 32000.0f; // 目标的拉力值，单位g
 
     // 拉力环相关变量
     float now_tension_value = 0.0f;                            // 当前测得的拉力值
