@@ -20,7 +20,7 @@ volatile int e,f,g,h;
 
 int time_test_pushing = 0;
 
-float GM6020_angle_RELOAD[4] = {118.0f * PI / 180.0f, 241.0f * PI / 180.0f, 360.0f * PI / 180.0f, 479.0f * PI / 180.0f};
+float GM6020_angle_RELOAD[4] = {117.0f * PI / 180.0f, 241.0f * PI / 180.0f, 360.0f * PI / 180.0f, 479.0f * PI / 180.0f};
 float GM6020_angle_ELUDE[4] = {198.0f * PI / 180.0f, 316.0f * PI / 180.0f, 435.0f * PI / 180.0f, 559.0f * PI / 180.0f};
 
 
@@ -392,9 +392,8 @@ void Class_FSM_Pull_Calibration::Pull_Calibration_TIM_Status_PeriodElapsedCallba
         if (Status[Now_Status_Serial].Time > 100)
         {
             Angle_Forward = Booster->Motor_Pull.Get_Now_Angle();
-            Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_TORQUE);
-            Booster->Motor_Pull.Set_Target_Torque(0.f);
-            Booster->Motor_Pull.Set_Out(0.f);
+            Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_OMEGA);
+            Booster->Motor_Pull.Set_Target_Omega_Radian(0.0f);
             Set_Status(2);
         }
         else if (fabs(Booster->Motor_Pull.Get_Now_Torque()) < Torque_Threshold)
@@ -420,9 +419,8 @@ void Class_FSM_Pull_Calibration::Pull_Calibration_TIM_Status_PeriodElapsedCallba
         if (Status[Now_Status_Serial].Time > 100)
         {
             Angle_Backward = Booster->Motor_Pull.Get_Now_Angle();
-            Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_TORQUE);
-            Booster->Motor_Pull.Set_Target_Torque(0.f);
-            Booster->Motor_Pull.Set_Out(0.f);
+            Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_OMEGA);
+            Booster->Motor_Pull.Set_Target_Omega_Radian(0.0f);
             Set_Status(4);
         }
         else if (fabs(Booster->Motor_Pull.Get_Now_Torque()) < Torque_Threshold)
@@ -484,9 +482,8 @@ void Class_FSM_Reload_Linear_Calibration::Linear_Calibration_TIM_Status_PeriodEl
         if (Status[Now_Status_Serial].Time > 100)
         {
             Angle_Forward = Booster->Motor_Reload_Linear.Get_Now_Angle();
-            Booster->Motor_Reload_Linear.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_TORQUE);
-            Booster->Motor_Reload_Linear.Set_Target_Torque(0.f);
-            Booster->Motor_Reload_Linear.Set_Out(0.f);
+            Booster->Motor_Reload_Linear.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_OMEGA);
+            Booster->Motor_Reload_Linear.Set_Target_Omega_Radian(0.0f);
             Set_Status(2);
         }
         else if (fabs(Booster->Motor_Reload_Linear.Get_Now_Torque()) < Torque_Threshold)
@@ -512,9 +509,8 @@ void Class_FSM_Reload_Linear_Calibration::Linear_Calibration_TIM_Status_PeriodEl
         if (Status[Now_Status_Serial].Time > 100)
         {
             Angle_Backward = Booster->Motor_Reload_Linear.Get_Now_Angle();
-            Booster->Motor_Reload_Linear.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_TORQUE);
-            Booster->Motor_Reload_Linear.Set_Target_Torque(0.f);
-            Booster->Motor_Reload_Linear.Set_Out(0.f);
+            Booster->Motor_Reload_Linear.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_OMEGA);
+            Booster->Motor_Reload_Linear.Set_Target_Omega_Radian(0.0f);
             Set_Status(4);
         }
         else if (fabs(Booster->Motor_Reload_Linear.Get_Now_Torque()) < Torque_Threshold)
@@ -531,6 +527,7 @@ void Class_FSM_Reload_Linear_Calibration::Linear_Calibration_TIM_Status_PeriodEl
     break;
     case (5): // 校准检测
     {
+        //Booster->Motor_Reload_Linear.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
         // 定义上面是1.0f最大行程 下面是0.0f最小行程
         float now_position = Linear_Map_Position(Booster->Motor_Reload_Linear.Get_Now_Angle(), Angle_Backward, Angle_Forward, 1.0f); // 注意这里颠倒了
         Booster->Set_Now_position_reload_linear(now_position);                                                                       // 更新当前linear电机位置
@@ -970,7 +967,7 @@ void Class_FSM_Reload::Reload_TIM_Status_PeriodElapsedCallback()
 
             // // 换弹角度电机转动40度
             // Booster->target_position_reload_angle += 40.0f * PI / 180.0f;
-            Booster->target_position_reload_angle = GM6020_angle_RELOAD[dart_fired_count]; 
+            Booster->target_position_reload_angle = GM6020_angle_RELOAD[dart_fired_count] -0.5f * PI / 180.0f; // 这里预设了每发射一次，换弹角度电机增加40度，可以根据实际情况调整
         }
         // Stage 0: Push先下压到位（位置 / PB3电平 / PB3边沿 任一满足）
         if (pushing_stage == 0)
@@ -1071,7 +1068,7 @@ void Class_FSM_Reload::Reload_TIM_Status_PeriodElapsedCallback()
 
             // 换弹角度电机再次转动80度
             // Booster->target_position_reload_angle += 80.0f * PI / 180.0f;
-            Booster->target_position_reload_angle = GM6020_angle_ELUDE[dart_fired_count];
+            Booster->target_position_reload_angle = GM6020_angle_ELUDE[dart_fired_count] -0.5f * PI / 180.0f; // 这里预设了每发射一次，换弹角度电机增加40度，可以根据实际情况调整
             // 切换到第2阶段：防止重复加，并开始电机控制
             reload_servo_flag_lift = 2;
         }
