@@ -765,35 +765,33 @@ void Class_FSM_Shooting::Shooting_TIM_Status_PeriodElapsedCallback()
     case(Shooting_Control_Type_PULLRING): // 拉环状态，保持一段时间后进入发射状态
     {
         //bool is_reloading = (Booster->Get_Reload_Status() == Reload_Status_RELOADING);
-        static int ready_push_reached_time = -1;
+        // static int ready_push_reached_time = -1;
 
         // // Pull电机跑拉力环
         // 如果是刚进入该状态的第一帧
-        bool first_run = (Status[Now_Status_Serial].Time == 1);
+        // bool first_run = (Status[Now_Status_Serial].Time == 1);
 
-        // if (first_run)
+        // Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
+        // Booster->Pull_Tension_Control(first_run);
+
+        // if (fabs(Booster->now_tension_value - Booster->target_tension_value) < 100.0f) //单位g
         // {
-        //     ready_push_reached_time = -1;
-        //     (void)Consume_PD7_Press_Event(); // 清旧事件，防止跨状态误触发
+        //     tension_in_range_time_ms += 1; // 每次调用增加1ms
+        // }
+        // else
+        // {
+        //     tension_in_range_time_ms = 0; // 不满足条件，重置计时
         // }
 
         Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
-        Booster->Pull_Tension_Control(first_run);
+        Booster->Motor_Pull.Set_Target_Radian(0.04f);
 
-        if (fabs(Booster->now_tension_value - Booster->target_tension_value) < 100.0f) //单位g
-        {
-            tension_in_range_time_ms += 1; // 每次调用增加1ms
-        }
-        else
-        {
-            tension_in_range_time_ms = 0; // 不满足条件，重置计时
-        }
-
-        // 发射条件：上膛滑块就位，整体booster处于Normal状态，拉力环达到目标拉力。
+        // 发射条件：上膛滑块就位，整体booster处于Normal状态
         if (Booster->Get_Booster_Control_Type() == Booster_Control_Type_NORMAL 
         /*&& (is_reloading || ready_push_reached_time > 0)*/
-        && fabs(Booster->now_tension_value - Booster->target_tension_value) < 100.0f //单位g
-        && tension_in_range_time_ms >= 200 // 拉力稳定满足条件至少100ms
+        /*&& fabs(Booster->now_tension_value - Booster->target_tension_value) < 100.0f //单位g*/
+        /*&& tension_in_range_time_ms >= 200 // 拉力稳定满足条件至少100ms*/
+        && fabs(Booster->Get_Now_position_pull() - 0.04f) < push_target_tolerance // 拉力位置到位的条件，可以微调
         && Booster->Get_Reload_Status() == Reload_Status_FINISHED // 换弹完成状态
         && Referee_Allow_Shoot 
         /*&& test_allow_fire == 1*/)
