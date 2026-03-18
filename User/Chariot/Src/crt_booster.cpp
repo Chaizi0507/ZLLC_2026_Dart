@@ -637,8 +637,8 @@ void Class_FSM_Shooting::Shooting_TIM_Status_PeriodElapsedCallback()
             {
                 Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_OMEGA);
                 Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_OMEGA);
-                Booster->Motor_Push_L.Set_Target_Omega_Radian(-160.f);
-                Booster->Motor_Push_R.Set_Target_Omega_Radian(-160.f);
+                Booster->Motor_Push_L.Set_Target_Omega_Radian(-240.f);
+                Booster->Motor_Push_R.Set_Target_Omega_Radian(-240.f);
             }
         }
 
@@ -703,8 +703,8 @@ void Class_FSM_Shooting::Shooting_TIM_Status_PeriodElapsedCallback()
             
             Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_OMEGA);
             Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_OMEGA);
-            Booster->Motor_Push_L.Set_Target_Omega_Radian(160.f);
-            Booster->Motor_Push_R.Set_Target_Omega_Radian(160.f);
+            Booster->Motor_Push_L.Set_Target_Omega_Radian(240.f);
+            Booster->Motor_Push_R.Set_Target_Omega_Radian(240.f);
 
         }
 
@@ -751,9 +751,9 @@ void Class_FSM_Shooting::Shooting_TIM_Status_PeriodElapsedCallback()
             swtich_mode = 0;
         }
         float now_position = (Booster->Motor_Push_L.Get_Now_Radian() + Booster->Motor_Push_R.Get_Now_Radian()) / 2.0f / (2.0f * PI) * SCREW_LEAD;
-        Booster->Motor_Push_L.Set_Target_Omega_Radian(-50.0f);
-        Booster->Motor_Push_R.Set_Target_Omega_Radian(-50.0f);
-        if(now_position < offset_position - 0.015f)//向下30mm的行程距离
+        Booster->Motor_Push_L.Set_Target_Omega_Radian(-8.0f);
+        Booster->Motor_Push_R.Set_Target_Omega_Radian(-8.0f);
+        if(now_position < offset_position - 0.006f)//向下12mm的行程距离
         {
             Booster->Motor_Push_L.Set_Target_Omega_Radian(0.0f);
             Booster->Motor_Push_R.Set_Target_Omega_Radian(0.0f);
@@ -779,29 +779,6 @@ void Class_FSM_Shooting::Shooting_TIM_Status_PeriodElapsedCallback()
 
         Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
         Booster->Pull_Tension_Control(first_run);
-
-        // // Push电机在最上面位置保持，就位状态
-        // if (!is_reloading)
-        // {
-        //     // Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
-        //     // Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
-        //     // Booster->Motor_Push_L.Set_Target_Radian(0.95f);
-        //     // Booster->Motor_Push_R.Set_Target_Radian(0.95f);
-
-        //     bool ready_push_ready_or_switch =(fabs(Booster->Get_Now_position_push() - 0.95f) < push_target_tolerance) 
-        //     || Consume_PD7_Press_Event();
-                
-        //     // 到位或触发前端微动开关后立即锁位，防止继续顶压
-        //     if (ready_push_ready_or_switch && ready_push_reached_time < 0)
-        //     {
-        //         const float hold_push_pos_ready = Booster->Get_Now_position_push();
-        //         Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
-        //         Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
-        //         Booster->Motor_Push_L.Set_Target_Radian(hold_push_pos_ready-0.08);
-        //         Booster->Motor_Push_R.Set_Target_Radian(hold_push_pos_ready-0.08);
-        //         ready_push_reached_time = Status[Now_Status_Serial].Time;
-        //     }
-        // }
 
         if (fabs(Booster->now_tension_value - Booster->target_tension_value) < 100.0f) //单位g
         {
@@ -974,8 +951,8 @@ void Class_FSM_Reload::Reload_TIM_Status_PeriodElapsedCallback()
         {
             Booster->Motor_Push_L.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_OMEGA);
             Booster->Motor_Push_R.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_OMEGA);
-            Booster->Motor_Push_L.Set_Target_Omega_Radian(-120.f);
-            Booster->Motor_Push_R.Set_Target_Omega_Radian(-120.f);
+            Booster->Motor_Push_L.Set_Target_Omega_Radian(-240.f);
+            Booster->Motor_Push_R.Set_Target_Omega_Radian(-240.f);
 
             bool push_bottom_ready_or_switch =
                 (PB3_GPIO == 1) ||
@@ -1200,9 +1177,9 @@ float Motor_R_test_I = 28.f;
 float Motor_Push_Angle_P_test = 4200.0f;
 float Motor_Push_Angle_I_test = 0.0f;
 
-float Motor_Pull_Omega_test_P = 600.0f;
+float Motor_Pull_Omega_test_P = 900.0f;
 float Motor_Pull_Omega_test_I = 145.0f;
-float Motor_Pull_Angle_P_test = 1000.0f;
+float Motor_Pull_Angle_P_test = 2200.0f;
 float Motor_Pull_Angle_I_test = 0.0f;
 
 // 2006换弹直线电机

@@ -152,7 +152,7 @@ class Class_FSM_Pull_Calibration : public Class_FSM
 public:
     Class_Booster *Booster;
 
-    float Torque_Threshold = 1800.0f;//之前是1500 2000 
+    float Torque_Threshold = 2300.0f;//之前是1500 2000 
     float speed = 40.0f;
 
     float Angle_Forward = 0.0f;
@@ -171,7 +171,7 @@ class Class_FSM_Reload_Linear_Calibration : public Class_FSM
 public:
     Class_Booster *Booster;
 
-    float Torque_Threshold = 1100.0f;
+    float Torque_Threshold = 1050.0f;
     float speed = 20.0f;
 
     float Angle_Forward = 0.0f;
@@ -302,7 +302,7 @@ protected:
     /*----------------------------tension----------------------------------*/
     // 拉力相关变量
     float Measured_Tension = 0;     // 测量的拉力值
-    float Target_Tension = 34600.0f; // 目标的拉力值，单位g
+    float Target_Tension = 35000.0f; // 目标的拉力值，单位g
 
     // 拉力环相关变量
     float now_tension_value = 0.0f;                            // 当前测得的拉力值
