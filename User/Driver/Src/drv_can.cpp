@@ -262,8 +262,8 @@ void CAN_Init(FDCAN_HandleTypeDef *hcan, CAN_Call_Back Callback_Function)
 
         HAL_FDCAN_ConfigFilter(&hfdcan3, &fdcan_filter); // 接收ID2
         // 拒绝接收匹配不成功的标准ID和扩展ID,不接受远程帧
-        HAL_FDCAN_ConfigGlobalFilter(&hfdcan3, FDCAN_REJECT, FDCAN_REJECT, FDCAN_REJECT_REMOTE, FDCAN_REJECT_REMOTE);
-        HAL_FDCAN_ConfigFifoWatermark(&hfdcan3, FDCAN_CFG_RX_FIFO0, 1);
+        // HAL_FDCAN_ConfigGlobalFilter(&hfdcan3, FDCAN_REJECT, FDCAN_REJECT, FDCAN_REJECT_REMOTE, FDCAN_REJECT_REMOTE);
+        // HAL_FDCAN_ConfigFifoWatermark(&hfdcan3, FDCAN_CFG_RX_FIFO0, 1);
         HAL_FDCAN_ActivateNotification(&hfdcan3, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
     }
     // can_filter_init(hcan);
@@ -367,11 +367,11 @@ void TIM_CAN_PeriodElapsedCallback()
         CAN_Send_Data(&hfdcan1, 0x200, CAN1_0x200_Tx_Data, 8); // 云台电机 按照0x200 ID 发送 可控制多个电机
         CAN_Send_Data(&hfdcan1, 0x1ff, CAN1_0x1ff_Tx_Data, 8); // 拨弹盘电机 按照0x1ff ID 发送 可控制多个电机
 
-        // //CAN2
+        // //CAN2->Gimble 
         // CAN_Send_Data(&hfdcan2, 0x200, CAN2_0x200_Tx_Data, 8); //云台电机 按照0x200 ID 发送 可控制多个电机
 
-        // //CAN3
-        // CAN_Send_Data(&hfdcan3, 0x200, CAN3_0x200_Tx_Data, 8); //拨弹盘  按照0x200 ID 发送 可控制多个电机
+        //CAN3->MINIPC
+        CAN_Send_Data(&hfdcan3, 0x100, CAN3_MiniPC_Tx_Data_C, 8); //MINIC  按照0x100 ID 发送 
     }
     if (mod4 == 4) // 250Hz
     {

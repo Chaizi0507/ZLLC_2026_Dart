@@ -285,11 +285,16 @@ void Gimbal_Device_CAN2_Callback(Struct_CAN_Rx_Buffer *CAN_RxMessage)
 #endif
 
 #ifdef GIMBAL
-void Gimbal_Device_CAN3_Callback(Struct_CAN_Rx_Buffer *CAN_RxMessage){
+void Gimbal_Device_CAN3_Callback(Struct_CAN_Rx_Buffer *CAN_RxMessage)
+{
     switch (CAN_RxMessage->Header.Identifier)
     {
-
-	}
+        case(0x106):
+        {
+            chariot.MiniPC.CAN_RxCpltCallback();
+        }
+        break;
+    }
 }
 #endif
 /**
@@ -610,7 +615,7 @@ extern "C" void Task_Init()
         #endif
         //上位机USB
         USB_Init(&MiniPC_USB_Manage_Object,MiniPC_USB_Callback);
-        //上位机串口
+        // //上位机串口
         UART_Init(&huart8, MiniPC_UART_Callback, 56);
         //初始化拉力机RS485
         RS485_Init();

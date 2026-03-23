@@ -439,6 +439,8 @@ public:
     inline float Get_Now_Roll_Angle();
     inline float Get_Now_Relative_Angle();
     inline float Get_Gimbal_Angle_Yaw();
+    inline uint8_t Get_CAN_Command_Flag();
+    inline int16_t Get_CAN_Command_Speed();
 
     inline uint8_t Get_Target_Invincible_State();
     inline Enum_MiniPC_Chassis_Control_Mode Get_Chassis_Control_Mode();
@@ -462,10 +464,13 @@ public:
     inline void Set_Armor_Attacked_Ammo_Status(Enum_MiniPC_Data_Status __Armor_Attacked_Ammo_Status);
     inline void Set_Self_Color(Enum_MiniPC_Self_Color __Self_Color);
     inline void Set_Outpost_Status(Enum_MiniPC_Data_Status __Outpost_Status);
+    inline void Set_CAN_Feedback(uint8_t __Flag, int16_t __Speed, uint8_t __Reserve = 0x00);
 
     void Append_CRC16_Check_Sum(uint8_t * pchMessage, uint32_t dwLength);
     bool Verify_CRC16_Check_Sum(const uint8_t * pchMessage, uint32_t dwLength);
     uint16_t Get_CRC16_Check_Sum(const uint8_t * pchMessage, uint32_t dwLength, uint16_t wCRC);
+    bool Verify_CAN_MiniPC_Frame(const uint8_t *Frame_Data) const;
+    uint8_t Get_CAN_MiniPC_Frame_Sum(const uint8_t *Frame_Data) const;
 
     float calc_yaw(float x, float y, float z);
     float calc_distance(float x, float y, float z) ;
@@ -500,6 +505,8 @@ protected:
     uint8_t Frame_Rear; 
 
     //常量
+    static const uint8_t CAN_FRAME_HEADER_0 = 0xAA;
+    static const uint8_t CAN_FRAME_HEADER_1 = 0x55;
     
     //内部变量
 
@@ -535,6 +542,16 @@ protected:
     // 距离
     float Distance;
     float Error;
+
+    // CAN协议读变量
+    uint8_t CAN_Command_Flag = 0;
+    int16_t CAN_Command_Speed = 0;
+    uint8_t CAN_Command_Reserve = 0;
+
+    // CAN协议写变量
+    uint8_t CAN_Feedback_Flag = 0;
+    int16_t CAN_Feedback_Speed = 0;
+    uint8_t CAN_Feedback_Reserve = 0;
 
 
     //写变量
@@ -637,6 +654,16 @@ float Class_MiniPC::Get_Gimbal_Angle_Yaw()
 {
     return (Now_Angle_Yaw);
 }
+
+uint8_t Class_MiniPC::Get_CAN_Command_Flag()
+{
+    return (CAN_Command_Flag);
+}
+
+int16_t Class_MiniPC::Get_CAN_Command_Speed()
+{
+    return (CAN_Command_Speed);
+}
 /**
  * @brief 获取底盘移动控制模式
  *
@@ -690,6 +717,13 @@ void Class_MiniPC::Set_Gimbal_Now_Relative_Angle(float __Gimbal_Now_Relative_Ang
 void Class_MiniPC::Set_Gimbal_Now_Yaw_Angle(float __Gimbal_Now_Yaw_Angle)
 {
     Now_Angle_Yaw = __Gimbal_Now_Yaw_Angle;
+}
+
+void Class_MiniPC::Set_CAN_Feedback(uint8_t __Flag, int16_t __Speed, uint8_t __Reserve)
+{
+    CAN_Feedback_Flag = __Flag;
+    CAN_Feedback_Speed = __Speed;
+    CAN_Feedback_Reserve = __Reserve;
 }
 
 
