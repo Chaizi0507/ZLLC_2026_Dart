@@ -428,7 +428,7 @@ void Class_Chariot::Control_Gimbal()
     }
     else if (DR16.Get_Left_Switch() == DR16_Switch_Status_UP) // 校准模式
     {
-        Gimbal.Set_Gimbal_Control_Type(Gimbal_Control_Type_YAW_CALIBRATION);
+        Gimbal.Set_Gimbal_Control_Type(Gimbal_Control_Type_YAW_UNCALIBRATION);
     }
 }
 #endif

@@ -238,7 +238,7 @@ void CAN_Init(FDCAN_HandleTypeDef *hcan, CAN_Call_Back Callback_Function)
         fdcan_filter.IdType = FDCAN_STANDARD_ID; // 标准ID
         fdcan_filter.FilterIndex = 0;            // 滤波器索引
         fdcan_filter.FilterType = FDCAN_FILTER_MASK;
-        fdcan_filter.FilterConfig = FDCAN_FILTER_TO_RXFIFO1; // 过滤器0关联到FIFO0
+        fdcan_filter.FilterConfig = FDCAN_FILTER_TO_RXFIFO1; // 过滤器0关联到FIFO1
         fdcan_filter.FilterID1 = 0x00;
         fdcan_filter.FilterID2 = 0x00;
 
@@ -364,14 +364,14 @@ void TIM_CAN_PeriodElapsedCallback()
     {
         mod5 = 0;
         // // CAN1->Booster
-        CAN_Send_Data(&hfdcan1, 0x200, CAN1_0x200_Tx_Data, 8); // 云台电机 按照0x200 ID 发送 可控制多个电机
-        CAN_Send_Data(&hfdcan1, 0x1ff, CAN1_0x1ff_Tx_Data, 8); // 拨弹盘电机 按照0x1ff ID 发送 可控制多个电机
+        CAN_Send_Data(&hfdcan1, 0x200, CAN1_0x200_Tx_Data, 8); // BOOST电机 按照0x200 ID 发送 可控制多个电机
+        CAN_Send_Data(&hfdcan1, 0x1ff, CAN1_0x1ff_Tx_Data, 8); // RELOAD 6020电机 按照0x1ff ID 发送 可控制多个电机
 
-        // //CAN2->Gimble 
-        // CAN_Send_Data(&hfdcan2, 0x200, CAN2_0x200_Tx_Data, 8); //云台电机 按照0x200 ID 发送 可控制多个电机
+        // //CAN2->Gimbal 
+        CAN_Send_Data(&hfdcan2, 0x200, CAN2_0x200_Tx_Data, 8); //yaw电机 按照0x200 ID 发送 
 
         //CAN3->MINIPC
-        CAN_Send_Data(&hfdcan3, 0x100, CAN3_MiniPC_Tx_Data_C, 8); //MINIC  按照0x100 ID 发送 
+        // CAN_Send_Data(&hfdcan3, 0x100, CAN3_MiniPC_Tx_Data_C, 8); //MINIC  按照0x100 ID 发送 
     }
     if (mod4 == 4) // 250Hz
     {

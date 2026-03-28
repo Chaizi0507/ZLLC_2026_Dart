@@ -9,6 +9,11 @@ virtualFolder:
   name: <virtual_root>
   files:
     - path: ../Drivers/CMSIS/DSP/Lib/ARM/arm_cortexM7lfsp_math.lib
+    - path: .cmsis/libdsp/arm/arm_cortexM7b_math.lib
+    - path: .cmsis/libdsp/arm/arm_cortexM7bfdp_math.lib
+    - path: .cmsis/libdsp/arm/arm_cortexM7bfsp_math.lib
+    - path: .cmsis/libdsp/arm/arm_cortexM7l_math.lib
+    - path: .cmsis/libdsp/arm/arm_cortexM7lfdp_math.lib
   folders:
     - name: Config
       files:

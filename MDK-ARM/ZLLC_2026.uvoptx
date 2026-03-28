@@ -347,32 +347,32 @@
         <Ww>
           <count>39</count>
           <WinNumber>1</WinNumber>
-          <ItemText>ready_pre_push_reached_time</ItemText>
+          <ItemText>enable_booster_flag</ItemText>
         </Ww>
         <Ww>
           <count>40</count>
           <WinNumber>1</WinNumber>
-          <ItemText>is_reloading</ItemText>
+          <ItemText>\\ZLLC_2026\../User/Chariot/Src/crt_booster.cpp\Referee_Allow_Shoot</ItemText>
         </Ww>
         <Ww>
           <count>41</count>
           <WinNumber>1</WinNumber>
-          <ItemText>time_reloading</ItemText>
+          <ItemText>\\ZLLC_2026\../User/Chariot/Src/crt_booster.cpp\Referee_Allow_Shoot</ItemText>
         </Ww>
         <Ww>
           <count>42</count>
           <WinNumber>1</WinNumber>
-          <ItemText>enable_booster_flag</ItemText>
+          <ItemText>Target_test_b_pull</ItemText>
         </Ww>
         <Ww>
           <count>43</count>
           <WinNumber>1</WinNumber>
-          <ItemText>\\ZLLC_2026\../User/Chariot/Src/crt_booster.cpp\Referee_Allow_Shoot</ItemText>
+          <ItemText>PB10_GPIO</ItemText>
         </Ww>
         <Ww>
           <count>44</count>
           <WinNumber>1</WinNumber>
-          <ItemText>\\ZLLC_2026\../User/Chariot/Src/crt_booster.cpp\Referee_Allow_Shoot</ItemText>
+          <ItemText>PB11_GPIO</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -579,7 +579,7 @@
         <Ww>
           <count>40</count>
           <WinNumber>2</WinNumber>
-          <ItemText>CAN3_MiniPC_Tx_Data_C</ItemText>
+          <ItemText>CAN3_MiniPC_Tx_Data_C,0x0A</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow2>
@@ -704,7 +704,7 @@
 
   <Group>
     <GroupName>Chariot</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -936,7 +936,7 @@
 
   <Group>
     <GroupName>Driver</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

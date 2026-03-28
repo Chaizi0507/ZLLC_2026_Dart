@@ -33,8 +33,7 @@ enum Enum_Gimbal_Control_Type :uint8_t
     Gimbal_Control_Type_DISABLE = 0,
     Gimbal_Control_Type_NORMAL,
     Gimbal_Control_Type_MINIPC,
-    Gimbal_Control_Type_YAW_CALIBRATION,
-    Gimbal_Control_Type_PITCH_CALIBRATION,
+    Gimbal_Control_Type_YAW_UNCALIBRATION,
 };
 
 /**
@@ -46,11 +45,10 @@ class Class_FSM_Yaw_Calibration : public Class_FSM
 public:
     Class_Gimbal *Gimbal;
 
-    float Torque_Threshold = 600.0f;
-    float speed = 0.5f;
+    // float Torque_Threshold = 600.0f;
+    float speed = 15.0f;
 
-    float Angle_Left = 0.0f;
-    float Angle_Right = 0.0f;
+    float Angle_Ref = 0.0f;
 
     void Yaw_Calibration_TIM_Status_PeriodElapsedCallback();
 };
@@ -116,6 +114,7 @@ public:
 
     void TIM_Calculate_PeriodElapsedCallback();
     float Calculate_Linear(float max,float min,float now_enc, float up_enc, float down_enc);
+    float Update_Yaw_Transform_From_Screw();
 
 protected:
     //初始化相关常量
@@ -123,10 +122,13 @@ protected:
     //常量
     float CRUISE_SPEED_YAW = 100.f;
     float CRUISE_SPEED_PITCH = 70.f;
-    // yaw轴最小值
-    float Min_Yaw_Angle = - 10.0f;
-    // yaw轴最大值
-    float Max_Yaw_Angle = 10.0f;
+    // yaw轴最小/最大行程（mm）
+    float Min_Yaw_Angle = 0.0f;
+    float Max_Yaw_Angle = 35.0f;
+
+    // 丝杆参数：5mm/圈，总行程350mm
+    float Yaw_Screw_Lead_mm_per_rev = 5.0f;
+    float Yaw_Screw_Total_Travel_mm = 350.0f;
 
     //yaw总角度
     float Yaw_Total_Angle;
@@ -151,6 +153,9 @@ protected:
 
     // yaw轴角度
     float Target_Yaw_Angle = 0.0f;
+
+    // yaw一次校准完成标志
+    bool Yaw_Calibrated = false;
 
     // pitch轴角度
     float Target_Pitch_Angle = 0.0f;
@@ -210,6 +215,14 @@ void Class_Gimbal::Set_Gimbal_Control_Type(Enum_Gimbal_Control_Type __Gimbal_Con
  */
 void Class_Gimbal::Set_Target_Yaw_Angle(float __Target_Yaw_Angle)
 {
+    if (__Target_Yaw_Angle < Min_Yaw_Angle)
+    {
+        __Target_Yaw_Angle = Min_Yaw_Angle;
+    }
+    if (__Target_Yaw_Angle > Max_Yaw_Angle)
+    {
+        __Target_Yaw_Angle = Max_Yaw_Angle;
+    }
     Target_Yaw_Angle = __Target_Yaw_Angle;
 }
 /**

@@ -85,6 +85,7 @@ extern UART_HandleTypeDef huart10;
 void UART_IDLEHandler(void);
 extern void Booster_On_PB3_Exti(void);
 extern void Booster_On_PD7_Exti(void);
+extern void Gimbal_On_PB11_Exti(void);
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -444,6 +445,7 @@ void EXTI15_10_IRQHandler(void)
 
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(INT1_ACCEL_Pin);
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
   HAL_GPIO_EXTI_IRQHandler(INT1_GYRO_Pin);
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
 
@@ -644,6 +646,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   if (GPIO_Pin == GPIO_PIN_7)
   {
     Booster_On_PD7_Exti();
+  }
+  
+  if (GPIO_Pin == GPIO_PIN_11)
+  {
+    Gimbal_On_PB11_Exti();
   }
 }
 

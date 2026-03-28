@@ -784,14 +784,14 @@ void Class_FSM_Shooting::Shooting_TIM_Status_PeriodElapsedCallback()
         // }
 
         Booster->Motor_Pull.Set_DJI_Motor_Control_Method(DJI_Motor_Control_Method_ANGLE);
-        Booster->Motor_Pull.Set_Target_Radian(0.04f);
+        Booster->Motor_Pull.Set_Target_Radian(0.2f);
 
         // 发射条件：上膛滑块就位，整体booster处于Normal状态
         if (Booster->Get_Booster_Control_Type() == Booster_Control_Type_NORMAL 
         /*&& (is_reloading || ready_push_reached_time > 0)*/
         /*&& fabs(Booster->now_tension_value - Booster->target_tension_value) < 100.0f //单位g*/
         /*&& tension_in_range_time_ms >= 200 // 拉力稳定满足条件至少100ms*/
-        && fabs(Booster->Get_Now_position_pull() - 0.04f) < push_target_tolerance // 拉力位置到位的条件，可以微调
+        && fabs(Booster->Get_Now_position_pull() - 0.2f) < push_target_tolerance // 拉力位置到位的条件，可以微调
         && Booster->Get_Reload_Status() == Reload_Status_FINISHED // 换弹完成状态
         && Referee_Allow_Shoot 
         /*&& test_allow_fire == 1*/)
@@ -1258,6 +1258,7 @@ int testtnum = 0;
 float test_position_b = 79.0f;
 float test_b = 3.0f;
 // float aaaaaaa = 22.0f;
+float Target_test_b_pull = 0.5f;
 
 void Class_Booster::Output()
 {
@@ -1305,6 +1306,9 @@ void Class_Booster::Output()
 
     // //角度环测试
     // Motor_Pull.Set_Target_Radian(Target_test_b_pull);
+    // Motor_Push_L.Set_Target_Radian(0.95f);
+    // Motor_Push_R.Set_Target_Radian(0.95f);
+
     // Motor_Push_L.Set_Target_Radian(target_position_b);
     // Motor_Push_R.Set_Target_Radian(target_position_b);
     // Motor_Reload_Linear.Set_Target_Radian(target_position_b);
@@ -1391,18 +1395,18 @@ void Class_Booster::TIM_Calculate_PeriodElapsedCallback()
     if(enable_booster_flag == 1)
     {
     // 拉力机数值更新
-    Measured_Tension = TensionMeter.Get_Tension();
+    // Measured_Tension = TensionMeter.Get_Tension();
 
     // 皮筋校准
     FSM_Push_Calibration.Push_Calibration_TIM_Status_PeriodElapsedCallback();
 
-    // // 拉力校准
+    // 拉力校准
     FSM_Pull_Calibration.Pull_Calibration_TIM_Status_PeriodElapsedCallback();
 
     // 直线电机校准
     FSM_Reload_Linear_Calibration.Linear_Calibration_TIM_Status_PeriodElapsedCallback();
 
-    // // 换弹状态机
+    // 换弹状态机
     FSM_Reload.Reload_TIM_Status_PeriodElapsedCallback();
 
     // 发射状态机
