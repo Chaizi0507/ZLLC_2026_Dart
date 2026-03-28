@@ -302,7 +302,11 @@ protected:
     /*----------------------------tension----------------------------------*/
     // 拉力相关变量
     float Measured_Tension = 0;     // 测量的拉力值
+<<<<<<< HEAD
     float Target_Tension = 35000.0f; // 目标的拉力值，单位g
+=======
+    float Target_Tension = 34600.0f; // 目标的拉力值，单位g
+>>>>>>> fc4b218f184c25112d3e29a1577361d088f2e5d6
 
     // 拉力环相关变量
     float now_tension_value = 0.0f;                            // 当前测得的拉力值
